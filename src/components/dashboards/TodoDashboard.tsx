@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { X, CheckSquare, Square, Plus, Trash2, Edit2, Calendar, Tag, Filter, SortAsc, SortDesc } from 'lucide-react';
 import { cn } from '../../utils/cn';
-
 interface TodoDashboardProps {
   onClose: () => void;
   onExecute: (data: any) => Promise<{ success: boolean; message: string }>;
 }
-
 interface TodoItem {
   id: string;
   title: string;
@@ -18,7 +16,6 @@ interface TodoItem {
   createdAt: Date;
   updatedAt: Date;
 }
-
 const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => {
   const [activeTab, setActiveTab] = useState<'tasks' | 'categories' | 'analytics' | 'settings'>('tasks');
   const [todos, setTodos] = useState<TodoItem[]>([]);
@@ -36,12 +33,9 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error' | 'loading'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
-
-  // Load saved data
   useEffect(() => {
     loadTodoData();
   }, []);
-
   const loadTodoData = () => {
     try {
       const savedTodos = localStorage.getItem('todo_items');
@@ -58,7 +52,6 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
       console.error('Failed to load todo data:', error);
     }
   };
-
   const saveTodoData = (newTodos: TodoItem[]) => {
     try {
       localStorage.setItem('todo_items', JSON.stringify(newTodos));
@@ -66,14 +59,11 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
       console.error('Failed to save todo data:', error);
     }
   };
-
   const addTodo = async () => {
     if (!newTodoTitle.trim()) return;
-
     setIsLoading(true);
     setStatus('loading');
     setStatusMessage('Adding task...');
-
     try {
       const newTodo: TodoItem = {
         id: Date.now().toString(),
@@ -86,22 +76,16 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
         createdAt: new Date(),
         updatedAt: new Date()
       };
-
       const updatedTodos = [...todos, newTodo];
       setTodos(updatedTodos);
       saveTodoData(updatedTodos);
-
-      // Execute todo action
       const result = await onExecute({
         toolData: { action: 'add_todo', todo: newTodo },
         context: { todos: updatedTodos }
       });
-
       if (result.success) {
         setStatus('success');
         setStatusMessage('Task added successfully');
-        
-        // Clear form
         setNewTodoTitle('');
         setNewTodoDescription('');
         setNewTodoPriority('medium');
@@ -119,14 +103,12 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
       setTimeout(() => setStatus('idle'), 3000);
     }
   };
-
   const toggleTodo = async (id: string) => {
     const updatedTodos = todos.map(todo =>
       todo.id === id ? { ...todo, completed: !todo.completed, updatedAt: new Date() } : todo
     );
     setTodos(updatedTodos);
     saveTodoData(updatedTodos);
-
     const todo = updatedTodos.find(t => t.id === id);
     if (todo) {
       await onExecute({
@@ -135,18 +117,15 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
       });
     }
   };
-
   const deleteTodo = async (id: string) => {
     const updatedTodos = todos.filter(todo => todo.id !== id);
     setTodos(updatedTodos);
     saveTodoData(updatedTodos);
-
     await onExecute({
       toolData: { action: 'delete_todo', id },
       context: { todos: updatedTodos }
     });
   };
-
   const updateTodo = async (updatedTodo: TodoItem) => {
     const updatedTodos = todos.map(todo =>
       todo.id === updatedTodo.id ? { ...updatedTodo, updatedAt: new Date() } : todo
@@ -154,13 +133,11 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
     setTodos(updatedTodos);
     saveTodoData(updatedTodos);
     setEditingTodo(null);
-
     await onExecute({
       toolData: { action: 'update_todo', todo: updatedTodo },
       context: { todos: updatedTodos }
     });
   };
-
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high': return 'text-red-600 bg-red-50 dark:bg-red-900/20';
@@ -169,16 +146,14 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
       default: return 'text-gray-600 bg-gray-50 dark:bg-gray-900/20';
     }
   };
-
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
-      case 'high': return '🔴';
-      case 'medium': return '🟡';
-      case 'low': return '🟢';
+      case 'high': return '';
+      case 'medium': return '';
+      case 'low': return '';
       default: return '⚪';
     }
   };
-
   const filteredAndSortedTodos = todos
     .filter(todo => {
       if (filterStatus === 'active') return !todo.completed;
@@ -215,23 +190,20 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
       }
       return sortOrder === 'asc' ? comparison : -comparison;
     });
-
   const categories = Array.from(new Set(todos.map(todo => todo.category)));
   const completedCount = todos.filter(todo => todo.completed).length;
   const totalCount = todos.length;
   const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-
   const tabs = [
     { id: 'tasks', label: 'Tasks', icon: CheckSquare },
     { id: 'categories', label: 'Categories', icon: Tag },
     { id: 'analytics', label: 'Analytics', icon: Calendar },
     { id: 'settings', label: 'Settings', icon: Filter }
   ];
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-6xl h-[90vh] flex flex-col">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
             <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30">
@@ -253,8 +225,7 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
             <X size={20} />
           </button>
         </div>
-
-        {/* Status Bar */}
+        {}
         {status !== 'idle' && (
           <div className={cn(
             "px-6 py-3 flex items-center space-x-2 transition-all duration-300",
@@ -268,8 +239,7 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
             <span className="text-sm font-medium">{statusMessage}</span>
           </div>
         )}
-
-        {/* Tabs */}
+        {}
         <div className="flex border-b border-gray-200 dark:border-gray-700">
           {tabs.map(tab => (
             <button
@@ -287,12 +257,11 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
             </button>
           ))}
         </div>
-
-        {/* Content */}
+        {}
         <div className="flex-1 overflow-y-auto p-6">
           {activeTab === 'tasks' && (
             <div className="space-y-6">
-              {/* Add New Task */}
+              {}
               <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Add New Task</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -370,8 +339,7 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
                   </div>
                 </div>
               </div>
-
-              {/* Filters and Sort */}
+              {}
               <div className="flex flex-wrap items-center gap-4">
                 <div className="flex items-center space-x-2">
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Status:</span>
@@ -431,8 +399,7 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
                   </button>
                 </div>
               </div>
-
-              {/* Task List */}
+              {}
               <div className="space-y-2">
                 {filteredAndSortedTodos.length === 0 ? (
                   <div className="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -454,7 +421,6 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
                       >
                         {todo.completed ? <CheckSquare size={20} className="text-green-600" /> : <Square size={20} />}
                       </button>
-                      
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -493,7 +459,6 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
                               )}
                             </div>
                           </div>
-                          
                           <div className="flex items-center space-x-1 ml-2">
                             <button
                               onClick={() => setEditingTodo(todo)}
@@ -516,11 +481,9 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
               </div>
             </div>
           )}
-
           {activeTab === 'categories' && (
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Task Categories</h3>
-              
               {categories.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                   <Tag className="w-12 h-12 mx-auto mb-2 opacity-50" />
@@ -533,7 +496,6 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
                     const completedCount = categoryTodos.filter(todo => todo.completed).length;
                     const totalCount = categoryTodos.length;
                     const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-                    
                     return (
                       <div
                         key={category}
@@ -565,11 +527,9 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
               )}
             </div>
           )}
-
           {activeTab === 'analytics' && (
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Task Analytics</h3>
-              
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                   <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Total Tasks</h4>
@@ -584,7 +544,6 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
                   <p className="text-2xl font-bold text-blue-600">{completionRate}%</p>
                 </div>
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                   <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Tasks by Priority</h4>
@@ -592,7 +551,6 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
                     {(['high', 'medium', 'low'] as const).map((priority) => {
                       const count = todos.filter(todo => todo.priority === priority).length;
                       const percentage = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
-                      
                       return (
                         <div key={priority} className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
@@ -608,7 +566,6 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
                     })}
                   </div>
                 </div>
-
                 <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                   <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Recent Activity</h4>
                   <div className="space-y-2">
@@ -632,11 +589,9 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
               </div>
             </div>
           )}
-
           {activeTab === 'settings' && (
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Todo Settings</h3>
-              
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -648,7 +603,6 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
                     <option value="high">High</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Default Category
@@ -660,7 +614,6 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
                     placeholder="Default category for new tasks"
                   />
                 </div>
-
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -672,7 +625,6 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
                     Auto-complete tasks when due date passes
                   </label>
                 </div>
-
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -684,7 +636,6 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
                     Show completed tasks in list
                   </label>
                 </div>
-
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -703,5 +654,4 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onClose, onExecute }) => 
     </div>
   );
 };
-
-export default TodoDashboard; 
+export default TodoDashboard;

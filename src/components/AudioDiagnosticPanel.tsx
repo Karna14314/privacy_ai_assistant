@@ -3,19 +3,16 @@ import { Mic, MicOff, Volume2, VolumeX, CheckCircle, XCircle, AlertTriangle } fr
 import { invoke } from '@tauri-apps/api/core';
 import { usePythonBackendLLM } from '../hooks/usePythonBackendLLM';
 import { useRealtimeSTT } from '../hooks/useRealtimeSTT';
-
 interface AudioDiagnosticPanelProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
 interface DiagnosticResult {
   test: string;
   status: 'pending' | 'success' | 'error' | 'warning';
   message: string;
   details?: string;
 }
-
 export const AudioDiagnosticPanel: React.FC<AudioDiagnosticPanelProps> = ({
   isOpen,
   onClose
@@ -23,7 +20,6 @@ export const AudioDiagnosticPanel: React.FC<AudioDiagnosticPanelProps> = ({
   const [diagnostics, setDiagnostics] = useState<DiagnosticResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [currentTest, setCurrentTest] = useState<string>('');
-
   const { backendHealth, checkBackendHealth } = usePythonBackendLLM();
   const { 
     micPermission, 
@@ -35,19 +31,15 @@ export const AudioDiagnosticPanel: React.FC<AudioDiagnosticPanelProps> = ({
     finalText,
     error: sttError
   } = useRealtimeSTT();
-
   const addDiagnostic = (test: string, status: DiagnosticResult['status'], message: string, details?: string) => {
     setDiagnostics(prev => [
       ...prev.filter(d => d.test !== test),
       { test, status, message, details }
     ]);
   };
-
   const runDiagnostics = async () => {
     setIsRunning(true);
     setDiagnostics([]);
-
-    // Test 1: Microphone Access
     setCurrentTest('Microphone Access');
     try {
       const hasPermission = await requestMicPermission();
@@ -59,8 +51,6 @@ export const AudioDiagnosticPanel: React.FC<AudioDiagnosticPanelProps> = ({
     } catch (error) {
       addDiagnostic('mic-access', 'error', 'Microphone test failed', String(error));
     }
-
-    // Test 2: Audio Recording
     setCurrentTest('Audio Recording');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -74,24 +64,19 @@ export const AudioDiagnosticPanel: React.FC<AudioDiagnosticPanelProps> = ({
     } catch (error) {
       addDiagnostic('audio-recording', 'error', 'Audio recording test failed', String(error));
     }
-
-    // Test 3: Backend Health
     setCurrentTest('Backend Health');
     try {
-      await checkBackendHealth();
-      if (backendHealth.isHealthy) {
+      const isHealthy = await checkBackendHealth();
+      if (isHealthy) {
         addDiagnostic('backend-health', 'success', 'Python backend is healthy');
       } else {
-        addDiagnostic('backend-health', 'error', 'Backend health check failed', backendHealth.error || 'Unknown error');
+        addDiagnostic('backend-health', 'error', 'Backend health check failed', 'Backend reported unhealthy status');
       }
     } catch (error) {
       addDiagnostic('backend-health', 'error', 'Backend health check failed', String(error));
     }
-
-    // Test 4: STT WebSocket Connection
     setCurrentTest('STT WebSocket');
     try {
-      // The connection test is handled by the useRealtimeSTT hook
       if (sttConnected) {
         addDiagnostic('stt-websocket', 'success', 'STT WebSocket connected');
       } else {
@@ -100,8 +85,6 @@ export const AudioDiagnosticPanel: React.FC<AudioDiagnosticPanelProps> = ({
     } catch (error) {
       addDiagnostic('stt-websocket', 'error', 'STT WebSocket test failed', String(error));
     }
-
-    // Test 5: Static STT Test
     setCurrentTest('Static STT Test');
     try {
       const result = await invoke<any>('test_static_file_stt');
@@ -113,8 +96,6 @@ export const AudioDiagnosticPanel: React.FC<AudioDiagnosticPanelProps> = ({
     } catch (error) {
       addDiagnostic('static-stt', 'error', 'Static STT test failed', String(error));
     }
-
-    // Test 6: LLM Response Test
     setCurrentTest('LLM Response Test');
     try {
       const response = await invoke<string>('generate_llm_response', {
@@ -128,11 +109,9 @@ export const AudioDiagnosticPanel: React.FC<AudioDiagnosticPanelProps> = ({
     } catch (error) {
       addDiagnostic('llm-response', 'error', 'LLM response test failed', String(error));
     }
-
     setCurrentTest('');
     setIsRunning(false);
   };
-
   const getStatusIcon = (status: DiagnosticResult['status']) => {
     switch (status) {
       case 'success':
@@ -145,9 +124,7 @@ export const AudioDiagnosticPanel: React.FC<AudioDiagnosticPanelProps> = ({
         return <div className="w-5 h-5 rounded-full bg-gray-300 animate-pulse" />;
     }
   };
-
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
@@ -159,7 +136,6 @@ export const AudioDiagnosticPanel: React.FC<AudioDiagnosticPanelProps> = ({
             Test microphone, STT, and LLM functionality
           </p>
         </div>
-
         <div className="p-6 overflow-y-auto max-h-96">
           {isRunning && (
             <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -171,7 +147,6 @@ export const AudioDiagnosticPanel: React.FC<AudioDiagnosticPanelProps> = ({
               </div>
             </div>
           )}
-
           <div className="space-y-3">
             {diagnostics.map((diagnostic, index) => (
               <div key={index} className="flex items-start space-x-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700">
@@ -194,7 +169,6 @@ export const AudioDiagnosticPanel: React.FC<AudioDiagnosticPanelProps> = ({
               </div>
             ))}
           </div>
-
           {diagnostics.length === 0 && !isRunning && (
             <div className="text-center py-8">
               <p className="text-gray-500 dark:text-gray-400">
@@ -203,7 +177,6 @@ export const AudioDiagnosticPanel: React.FC<AudioDiagnosticPanelProps> = ({
             </div>
           )}
         </div>
-
         <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-between">
           <button
             onClick={runDiagnostics}
@@ -223,5 +196,4 @@ export const AudioDiagnosticPanel: React.FC<AudioDiagnosticPanelProps> = ({
     </div>
   );
 };
-
 export default AudioDiagnosticPanel;

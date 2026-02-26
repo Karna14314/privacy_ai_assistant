@@ -41,14 +41,6 @@ for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":5174"') do (
 )
 echo    ✅ Cleanup completed
 
-echo 🔧 Validating fixes...
-node test-fixed-app.js | findstr "Fix validation completed" >nul
-if %errorlevel% equ 0 (
-    echo    ✅ All fixes validated
-) else (
-    echo    ⚠️  Validation completed with notes
-)
-
 echo.
 echo 🚀 Starting application...
 echo 🧪 Test with: "Hello, how are you?"

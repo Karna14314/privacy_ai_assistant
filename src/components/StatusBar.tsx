@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Activity, WifiOff, Brain, Mic, Volume2, AlertTriangle, CheckCircle } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { ModelHealthStatus } from '../utils/modelHealth';
-
 interface StatusBarProps {
   modelHealth: ModelHealthStatus;
   isThinking?: boolean;
@@ -10,9 +9,7 @@ interface StatusBarProps {
   isSpeaking?: boolean;
   className?: string;
 }
-
 type SystemStatus = 'healthy' | 'warning' | 'error' | 'offline';
-
 export const StatusBar: React.FC<StatusBarProps> = ({
   modelHealth,
   isThinking = false,
@@ -21,16 +18,12 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   className = ''
 }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
-
-  // Update time every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-
     return () => clearInterval(timer);
   }, []);
-
   const getSystemStatus = (): SystemStatus => {
     if (!modelHealth.isAvailable) {
       return modelHealth.connectionState === 'error' ? 'error' : 'offline';
@@ -40,7 +33,6 @@ export const StatusBar: React.FC<StatusBarProps> = ({
     }
     return 'healthy';
   };
-
   const getStatusColor = (status: SystemStatus) => {
     switch (status) {
       case 'healthy':
@@ -53,7 +45,6 @@ export const StatusBar: React.FC<StatusBarProps> = ({
         return 'text-gray-600 dark:text-gray-400';
     }
   };
-
   const getStatusIcon = (status: SystemStatus) => {
     switch (status) {
       case 'healthy':
@@ -66,7 +57,6 @@ export const StatusBar: React.FC<StatusBarProps> = ({
         return <WifiOff className="w-4 h-4" />;
     }
   };
-
   const getCurrentActivity = () => {
     if (isListening) {
       return {
@@ -91,18 +81,16 @@ export const StatusBar: React.FC<StatusBarProps> = ({
     }
     return null;
   };
-
   const systemStatus = getSystemStatus();
   const currentActivity = getCurrentActivity();
-
   return (
     <div className={cn(
       'flex items-center justify-between px-4 py-2 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-sm',
       className
     )}>
-      {/* Left Section - System Status */}
+      {}
       <div className="flex items-center space-x-4">
-        {/* Connection Status */}
+        {}
         <div className="flex items-center space-x-2">
           <div className={cn('flex items-center space-x-1', getStatusColor(systemStatus))}>
             {getStatusIcon(systemStatus)}
@@ -112,14 +100,12 @@ export const StatusBar: React.FC<StatusBarProps> = ({
                systemStatus === 'error' ? 'Error' : 'Offline'}
             </span>
           </div>
-          
-          {/* Model Info */}
+          {}
           <span className="text-gray-500 dark:text-gray-400 text-xs">
             {modelHealth.modelName}
           </span>
         </div>
-
-        {/* Activity Indicator */}
+        {}
         {currentActivity && (
           <>
             <div className="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
@@ -130,8 +116,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
           </>
         )}
       </div>
-
-      {/* Center Section - Additional Info */}
+      {}
       <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
         {modelHealth.lastSuccessfulCheck && (
           <div className="flex items-center space-x-1">
@@ -146,8 +131,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
           </div>
         )}
       </div>
-
-      {/* Right Section - Time */}
+      {}
       <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
         <span>
           {currentTime.toLocaleTimeString('en-US', {
@@ -161,5 +145,4 @@ export const StatusBar: React.FC<StatusBarProps> = ({
     </div>
   );
 };
-
 export default StatusBar;

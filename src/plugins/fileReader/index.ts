@@ -1,6 +1,5 @@
 import { Plugin, PluginResult, PluginContext } from '../../types';
 import { readTextFile } from '@tauri-apps/plugin-fs';
-
 const manifest = {
   name: "fileReader",
   description: "Read content from local .txt and .md files with support for file browsing",
@@ -11,18 +10,12 @@ const manifest = {
   category: "file" as const,
   permissions: ["file:read", "fs:read"]
 };
-
-/**
- * File Reader Plugin - Reads content from local .txt and .md files
- */
 class FileReaderPlugin implements Plugin {
   manifest = manifest;
   private supportedExtensions = ['.txt', '.md', '.markdown', '.json', '.csv', '.log'];
-
   async run(input: string, context?: PluginContext): Promise<PluginResult> {
     try {
       const command = this.parseCommand(input);
-      
       switch (command.action) {
         case 'read':
           return await this.readFile(command.filePath);
@@ -43,43 +36,27 @@ class FileReaderPlugin implements Plugin {
       };
     }
   }
-
   private parseCommand(input: string): { action: string; filePath?: string; lines?: number } {
     const normalizedInput = input.toLowerCase().trim();
-    
-    // Extract file path from input
     const filePath = this.extractFilePath(input);
-    
-    // Preview file (first N lines)
     if (normalizedInput.includes('preview') || normalizedInput.includes('peek')) {
       const lines = this.extractLineCount(input) || 20;
       return { action: 'preview', filePath, lines };
     }
-    
-    // Get file info
     if (normalizedInput.includes('info') || normalizedInput.includes('details')) {
       return { action: 'info', filePath };
     }
-    
-    // Default to read
     return { action: 'read', filePath };
   }
-
   private extractFilePath(input: string): string {
-    // Remove command words and extract file path
     let cleanInput = input.replace(/^(read|open|show|preview|peek|info|details)\s+(file)?\s*/i, '').trim();
-    
-    // Remove quotes if present
     cleanInput = cleanInput.replace(/^["']|["']$/g, '');
-    
     return cleanInput;
   }
-
   private extractLineCount(input: string): number | undefined {
     const match = input.match(/(\d+)\s*(lines?|rows?)/i);
     return match ? parseInt(match[1], 10) : undefined;
   }
-
   private async readFile(filePath: string): Promise<PluginResult> {
     if (!filePath || filePath.trim().length === 0) {
       return {
@@ -87,19 +64,14 @@ class FileReaderPlugin implements Plugin {
         error: 'Please specify a file path to read'
       };
     }
-
     try {
-      // Validate file extension
       if (!this.isSupportedFile(filePath)) {
         return {
           success: false,
           error: `Unsupported file type. Supported extensions: ${this.supportedExtensions.join(', ')}`
         };
       }
-
-      // Read file content
       const content = await readTextFile(filePath);
-      
       if (!content || content.trim().length === 0) {
         return {
           success: true,
@@ -107,22 +79,16 @@ class FileReaderPlugin implements Plugin {
           data: { filePath, content: '', size: 0, lines: 0 }
         };
       }
-
       const lines = content.split('\n').length;
       const size = new Blob([content]).size;
-      
-      // Format the response
-      let message = `📄 **File: ${filePath}**\n`;
+      let message = ` **File: ${filePath}**\n`;
       message += `Size: ${this.formatFileSize(size)} | Lines: ${lines}\n\n`;
-      
-      // Truncate content if too long
       if (content.length > 5000) {
         const truncated = content.substring(0, 4900);
         message += `${truncated}\n\n... (content truncated, showing first 5000 characters)`;
       } else {
         message += content;
       }
-
       return {
         success: true,
         message,
@@ -135,7 +101,6 @@ class FileReaderPlugin implements Plugin {
       };
     }
   }
-
   private async previewFile(filePath: string, maxLines: number = 20): Promise<PluginResult> {
     if (!filePath || filePath.trim().length === 0) {
       return {
@@ -143,19 +108,14 @@ class FileReaderPlugin implements Plugin {
         error: 'Please specify a file path to preview'
       };
     }
-
     try {
-      // Validate file extension
       if (!this.isSupportedFile(filePath)) {
         return {
           success: false,
           error: `Unsupported file type. Supported extensions: ${this.supportedExtensions.join(', ')}`
         };
       }
-
-      // Read file content
       const content = await readTextFile(filePath);
-      
       if (!content || content.trim().length === 0) {
         return {
           success: true,
@@ -163,19 +123,15 @@ class FileReaderPlugin implements Plugin {
           data: { filePath, preview: '', totalLines: 0 }
         };
       }
-
       const lines = content.split('\n');
       const previewLines = lines.slice(0, maxLines);
       const preview = previewLines.join('\n');
-      
-      let message = `👀 **Preview: ${filePath}**\n`;
+      let message = ` **Preview: ${filePath}**\n`;
       message += `Showing ${previewLines.length} of ${lines.length} lines\n\n`;
       message += preview;
-      
       if (lines.length > maxLines) {
         message += `\n\n... (${lines.length - maxLines} more lines)`;
       }
-
       return {
         success: true,
         message,
@@ -188,7 +144,6 @@ class FileReaderPlugin implements Plugin {
       };
     }
   }
-
   private async getFileInfo(filePath: string): Promise<PluginResult> {
     if (!filePath || filePath.trim().length === 0) {
       return {
@@ -196,19 +151,14 @@ class FileReaderPlugin implements Plugin {
         error: 'Please specify a file path to get info'
       };
     }
-
     try {
-      // Read file to get basic info
       const content = await readTextFile(filePath);
       const lines = content.split('\n').length;
       const size = new Blob([content]).size;
       const words = content.split(/\s+/).filter(word => word.length > 0).length;
       const chars = content.length;
-      
-      // Get file extension
       const extension = filePath.split('.').pop()?.toLowerCase() || 'unknown';
       const fileName = filePath.split('/').pop() || filePath;
-      
       let message = `ℹ️ **File Information**\n\n`;
       message += `**Name:** ${fileName}\n`;
       message += `**Path:** ${filePath}\n`;
@@ -217,7 +167,6 @@ class FileReaderPlugin implements Plugin {
       message += `**Lines:** ${lines.toLocaleString()}\n`;
       message += `**Words:** ${words.toLocaleString()}\n`;
       message += `**Characters:** ${chars.toLocaleString()}\n`;
-
       return {
         success: true,
         message,
@@ -239,21 +188,16 @@ class FileReaderPlugin implements Plugin {
       };
     }
   }
-
   private isSupportedFile(filePath: string): boolean {
     const extension = '.' + filePath.split('.').pop()?.toLowerCase();
     return this.supportedExtensions.includes(extension);
   }
-
   private formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 B';
-    
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 }
-
 export const fileReaderPlugin = new FileReaderPlugin();

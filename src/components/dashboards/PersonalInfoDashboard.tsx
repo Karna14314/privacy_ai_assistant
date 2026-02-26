@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { X, User, Plus, Trash2, Edit2, Save, Eye, EyeOff, Shield, Lock, Unlock, Key, Mail, Phone, MapPin, Calendar, Building, Globe } from 'lucide-react';
 import { cn } from '../../utils/cn';
-
 interface PersonalInfoDashboardProps {
   onClose: () => void;
   onExecute: (data: any) => Promise<{ success: boolean; message: string }>;
 }
-
 interface PersonalInfo {
   id: string;
   category: 'personal' | 'contact' | 'professional' | 'security' | 'preferences';
@@ -18,7 +16,6 @@ interface PersonalInfo {
   createdAt: Date;
   updatedAt: Date;
 }
-
 const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, onExecute }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'personal' | 'contact' | 'professional' | 'security' | 'preferences'>('overview');
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo[]>([]);
@@ -27,20 +24,15 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error' | 'loading'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
-
-  // Form state for new/editing item
   const [itemTitle, setItemTitle] = useState('');
   const [itemValue, setItemValue] = useState('');
   const [itemCategory, setItemCategory] = useState<'personal' | 'contact' | 'professional' | 'security' | 'preferences'>('personal');
   const [itemDescription, setItemDescription] = useState('');
   const [itemIsSensitive, setItemIsSensitive] = useState(false);
   const [itemIsEncrypted, setItemIsEncrypted] = useState(false);
-
-  // Load saved data
   useEffect(() => {
     loadPersonalInfoData();
   }, []);
-
   const loadPersonalInfoData = () => {
     try {
       const savedData = localStorage.getItem('personal_info_data');
@@ -52,7 +44,6 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
           updatedAt: new Date(item.updatedAt)
         })));
       } else {
-        // Initialize with default data
         const defaultData: PersonalInfo[] = [
           {
             id: '1',
@@ -128,7 +119,6 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
       console.error('Failed to load personal info data:', error);
     }
   };
-
   const savePersonalInfoData = (newData: PersonalInfo[]) => {
     try {
       localStorage.setItem('personal_info_data', JSON.stringify(newData));
@@ -136,7 +126,6 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
       console.error('Failed to save personal info data:', error);
     }
   };
-
   const createNewItem = () => {
     setEditingItem(null);
     setItemTitle('');
@@ -146,7 +135,6 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
     setItemIsSensitive(false);
     setItemIsEncrypted(false);
   };
-
   const editItem = (item: PersonalInfo) => {
     setEditingItem(item);
     setItemTitle(item.title);
@@ -156,17 +144,13 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
     setItemIsSensitive(item.isSensitive);
     setItemIsEncrypted(item.isEncrypted);
   };
-
   const saveItem = async () => {
     if (!itemTitle.trim() || !itemValue.trim()) return;
-
     setIsLoading(true);
     setStatus('loading');
     setStatusMessage('Saving information...');
-
     try {
       if (editingItem) {
-        // Update existing item
         const updatedItem: PersonalInfo = {
           ...editingItem,
           title: itemTitle.trim(),
@@ -177,18 +161,15 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
           isEncrypted: itemIsEncrypted,
           updatedAt: new Date()
         };
-
         const updatedData = personalInfo.map(item =>
           item.id === editingItem.id ? updatedItem : item
         );
         setPersonalInfo(updatedData);
         savePersonalInfoData(updatedData);
-
         const result = await onExecute({
           toolData: { action: 'update_personal_info', item: updatedItem },
           context: { personalInfo: updatedData }
         });
-
         if (result.success) {
           setStatus('success');
           setStatusMessage('Information updated successfully');
@@ -198,7 +179,6 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
           setStatusMessage(result.message);
         }
       } else {
-        // Create new item
         const newItem: PersonalInfo = {
           id: Date.now().toString(),
           title: itemTitle.trim(),
@@ -210,16 +190,13 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
           createdAt: new Date(),
           updatedAt: new Date()
         };
-
         const updatedData = [...personalInfo, newItem];
         setPersonalInfo(updatedData);
         savePersonalInfoData(updatedData);
-
         const result = await onExecute({
           toolData: { action: 'create_personal_info', item: newItem },
           context: { personalInfo: updatedData }
         });
-
         if (result.success) {
           setStatus('success');
           setStatusMessage('Information added successfully');
@@ -237,22 +214,18 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
       setTimeout(() => setStatus('idle'), 3000);
     }
   };
-
   const deleteItem = async (id: string) => {
     const updatedData = personalInfo.filter(item => item.id !== id);
     setPersonalInfo(updatedData);
     savePersonalInfoData(updatedData);
-
     if (editingItem?.id === id) {
       setEditingItem(null);
     }
-
     await onExecute({
       toolData: { action: 'delete_personal_info', id },
       context: { personalInfo: updatedData }
     });
   };
-
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'personal': return User;
@@ -263,7 +236,6 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
       default: return User;
     }
   };
-
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'personal': return 'text-blue-600 bg-blue-50 dark:bg-blue-900/20';
@@ -274,16 +246,13 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
       default: return 'text-gray-600 bg-gray-50 dark:bg-gray-900/20';
     }
   };
-
   const filteredItems = personalInfo.filter(item => {
     if (activeTab === 'overview') return true;
     return item.category === activeTab;
   });
-
   const categories = ['personal', 'contact', 'professional', 'security', 'preferences'] as const;
   const sensitiveItems = personalInfo.filter(item => item.isSensitive);
   const encryptedItems = personalInfo.filter(item => item.isEncrypted);
-
   const tabs = [
     { id: 'overview', label: 'Overview', icon: User },
     { id: 'personal', label: 'Personal', icon: User },
@@ -292,11 +261,10 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'preferences', label: 'Preferences', icon: Globe }
   ];
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-6xl h-[90vh] flex flex-col">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
             <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
@@ -318,8 +286,7 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
             <X size={20} />
           </button>
         </div>
-
-        {/* Status Bar */}
+        {}
         {status !== 'idle' && (
           <div className={cn(
             "px-6 py-3 flex items-center space-x-2 transition-all duration-300",
@@ -333,8 +300,7 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
             <span className="text-sm font-medium">{statusMessage}</span>
           </div>
         )}
-
-        {/* Tabs */}
+        {}
         <div className="flex border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
           {tabs.map(tab => (
             <button
@@ -352,12 +318,11 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
             </button>
           ))}
         </div>
-
-        {/* Content */}
+        {}
         <div className="flex-1 flex overflow-hidden">
-          {/* Main Content */}
+          {}
           <div className="flex-1 flex flex-col">
-            {/* Header Actions */}
+            {}
             <div className="p-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -383,8 +348,7 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
                 </button>
               </div>
             </div>
-
-            {/* Information List */}
+            {}
             <div className="flex-1 overflow-y-auto p-4">
               {filteredItems.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -433,24 +397,20 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
                           </button>
                         </div>
                       </div>
-
                       <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-1">
                         {item.title}
                       </h4>
-                      
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                         {item.isSensitive && !showSensitive 
                           ? '••••••••••••••••' 
                           : item.value
                         }
                       </p>
-
                       {item.description && (
                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                           {item.description}
                         </p>
                       )}
-
                       <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
                         <span>Updated: {item.updatedAt.toLocaleDateString()}</span>
                         <span>Created: {item.createdAt.toLocaleDateString()}</span>
@@ -461,8 +421,7 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
               )}
             </div>
           </div>
-
-          {/* Edit Panel */}
+          {}
           {editingItem !== null || (editingItem === null && itemTitle) ? (
             <div className="w-96 border-l border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800">
               <div className="flex items-center justify-between mb-4">
@@ -484,7 +443,6 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
                   <X size={16} />
                 </button>
               </div>
-
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -498,7 +456,6 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
                     placeholder="e.g., Full Name, Email Address"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Value *
@@ -511,7 +468,6 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
                     placeholder="Enter the information value"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Category
@@ -528,7 +484,6 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
                     <option value="preferences">Preferences</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Description
@@ -541,7 +496,6 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
                     placeholder="Optional description"
                   />
                 </div>
-
                 <div className="space-y-2">
                   <label className="flex items-center">
                     <input
@@ -562,7 +516,6 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
                     <span className="text-sm text-gray-700 dark:text-gray-300">Encrypt Data</span>
                   </label>
                 </div>
-
                 <button
                   onClick={saveItem}
                   disabled={isLoading || !itemTitle.trim() || !itemValue.trim()}
@@ -575,8 +528,7 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
             </div>
           ) : null}
         </div>
-
-        {/* Overview Stats */}
+        {}
         {activeTab === 'overview' && (
           <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -611,5 +563,4 @@ const PersonalInfoDashboard: React.FC<PersonalInfoDashboardProps> = ({ onClose, 
     </div>
   );
 };
-
-export default PersonalInfoDashboard; 
+export default PersonalInfoDashboard;

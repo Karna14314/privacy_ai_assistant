@@ -4,14 +4,12 @@ import { Copy, Check, User, Bot, Volume2, VolumeX, Loader2 } from 'lucide-react'
 import { Message } from '../types';
 import { cn } from '../utils/cn';
 import { useEnhancedVoice } from '../hooks/useEnhancedVoice';
-
 interface MessageBubbleProps {
   message: Message;
   onCopy?: () => void;
   isStreaming?: boolean;
   streamingText?: string;
 }
-
 export const MessageBubble: React.FC<MessageBubbleProps> = ({
   message,
   onCopy,
@@ -21,7 +19,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   const [copied, setCopied] = useState(false);
   const [isTTSPlaying, setIsTTSPlaying] = useState(false);
   const voice = useEnhancedVoice();
-
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(message.content);
@@ -32,14 +29,11 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
       console.error('Failed to copy message:', error);
     }
   };
-
   const handleTTS = async () => {
     if (isTTSPlaying) {
-      // Stop current TTS
       voice.stopSpeaking();
       setIsTTSPlaying(false);
     } else {
-      // Start TTS
       try {
         setIsTTSPlaying(true);
         await voice.speakText(message.content, { interrupt: true });
@@ -50,27 +44,20 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
       }
     }
   };
-
   const formatTimestamp = (timestamp: Date | string | number | undefined): string => {
     if (!timestamp) return 'Unknown';
-    
     const time = new Date(timestamp);
-    
-    // Validate the timestamp
     if (isNaN(time.getTime())) {
       return 'Invalid time';
     }
-    
     return new Intl.DateTimeFormat('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true,
     }).format(time);
   };
-
   const isUser = message.role === 'user';
   const isAssistant = message.role === 'assistant';
-
   return (
     <div
       className={cn(
@@ -79,7 +66,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         isAssistant && 'flex-row'
       )}
     >
-      {/* Avatar */}
+      {}
       <div
         className={cn(
           'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium',
@@ -89,10 +76,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
       >
         {isUser ? <User size={16} /> : <Bot size={16} />}
       </div>
-
-      {/* Message Content */}
+      {}
       <div className={cn('flex-1 min-w-0', isUser && 'flex flex-col items-end')}>
-        {/* Message Bubble */}
+        {}
         <div
           className={cn(
             'relative max-w-[70%] rounded-2xl px-4 py-2 shadow-sm transition-all duration-200',
@@ -101,7 +87,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
             isStreaming && isAssistant && 'ring-2 ring-blue-200 dark:ring-blue-800 ring-opacity-50'
           )}
         >
-          {/* Loading State */}
+          {}
           {message.isLoading && (
             <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
               <div className="loading-dots">
@@ -112,15 +98,13 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
               <span className="text-sm">Thinking...</span>
             </div>
           )}
-
-          {/* Error State */}
+          {}
           {message.error && (
             <div className="flex items-center gap-2 text-red-500 dark:text-red-400">
               <span className="text-sm">Error: {message.error}</span>
             </div>
           )}
-
-          {/* Message Content */}
+          {}
           {!message.isLoading && !message.error && (
             <div className="prose prose-sm max-w-none">
               {isAssistant ? (
@@ -156,25 +140,20 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                       )
                     }}
                   >
-                    {/* FIXED: Ensure content is always displayed with proper fallbacks */}
+                    {}
                     {(() => {
                       const content = message.content || streamingText || '';
                       const trimmedContent = content.trim();
-                      
-                      // FIXED: Handle different content states properly
                       if (trimmedContent === 'Thinking...' || trimmedContent === '') {
                         return 'Thinking...';
                       }
-                      
                       if (trimmedContent === 'No content available') {
                         return 'No response generated. Please try again.';
                       }
-                      
                       return trimmedContent || 'Processing...';
                     })()}
                   </ReactMarkdown>
-                  
-                  {/* FIXED: Show streaming indicator only when actually streaming */}
+                  {}
                   {(isStreaming || (message.metadata?.isStreaming && !message.metadata?.isPlaceholder)) && (
                     <span className="inline-flex items-center ml-2" aria-label="AI is typing">
                       <span className="flex space-x-1">
@@ -187,17 +166,16 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                 </div>
               ) : (
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                  {/* FIXED: Ensure user message content is always displayed */}
+                  {}
                   {message.content || 'No content available'}
                 </p>
               )}
             </div>
           )}
-
-          {/* Action Buttons */}
+          {}
           {!message.isLoading && !message.error && (
             <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              {/* TTS Button - Only for assistant messages */}
+              {}
               {isAssistant && message.content && message.content.trim() && (
                 <button
                   type="button"
@@ -217,8 +195,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                   )}
                 </button>
               )}
-
-              {/* Copy Button */}
+              {}
               <button
                 type="button"
                 onClick={handleCopy}
@@ -237,8 +214,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
             </div>
           )}
         </div>
-
-        {/* Timestamp */}
+        {}
         <div
           className={cn(
             'mt-1 text-xs text-gray-500 dark:text-gray-400',
@@ -251,5 +227,4 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
     </div>
   );
 };
-
 export default MessageBubble;

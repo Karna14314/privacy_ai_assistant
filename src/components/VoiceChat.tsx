@@ -17,14 +17,12 @@ import {
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { invoke } from '@tauri-apps/api/core';
-
 interface VoiceChatProps {
   className?: string;
   isVisible?: boolean;
   onToggle?: () => void;
   onTranscriptUpdate?: (transcript: string, isUser: boolean) => void;
 }
-
 interface VoiceMessage {
   id: string;
   content: string;
@@ -33,14 +31,12 @@ interface VoiceMessage {
   status: 'transcribing' | 'processing' | 'speaking' | 'complete';
   audioUrl?: string;
 }
-
 interface VoiceSettings {
   mode: 'push-to-talk' | 'continuous';
-  silenceThreshold: number; // seconds
+  silenceThreshold: number;
   playbackSpeed: number;
   autoPlay: boolean;
 }
-
 export const VoiceChat: React.FC<VoiceChatProps> = ({
   className,
   isVisible = false,
@@ -61,139 +57,96 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
   const [showSettings, setShowSettings] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
   const [silenceTimer, setSilenceTimer] = useState<NodeJS.Timeout | null>(null);
-  
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const animationFrameRef = useRef<number | null>(null);
-
-  // Initialize audio visualization
   const initializeAudioVisualization = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
-      
       const audioContext = new AudioContext();
       const analyser = audioContext.createAnalyser();
       const source = audioContext.createMediaStreamSource(stream);
-      
       analyser.fftSize = 256;
       source.connect(analyser);
-      
       audioContextRef.current = audioContext;
       analyserRef.current = analyser;
-      
       drawWaveform();
     } catch (error) {
       console.error('Failed to initialize audio:', error);
     }
   }, []);
-
-  // Draw audio waveform
   const drawWaveform = useCallback(() => {
     if (!canvasRef.current || !analyserRef.current) return;
-    
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     const analyser = analyserRef.current;
-    
     if (!ctx) return;
-    
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
-    
     const draw = () => {
       analyser.getByteFrequencyData(dataArray);
-      
-      ctx.fillStyle = 'rgb(15, 23, 42)'; // dark background
+      ctx.fillStyle = 'rgb(15, 23, 42)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
       const barWidth = (canvas.width / bufferLength) * 2.5;
       let barHeight;
       let x = 0;
-      
-      // Calculate average audio level
       const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
       setAudioLevel(average);
-      
       for (let i = 0; i < bufferLength; i++) {
         barHeight = (dataArray[i] / 255) * canvas.height;
-        
-        // Color based on intensity
         const intensity = dataArray[i] / 255;
         if (intensity > 0.7) {
-          ctx.fillStyle = 'rgb(239, 68, 68)'; // red for high
+          ctx.fillStyle = 'rgb(239, 68, 68)';
         } else if (intensity > 0.4) {
-          ctx.fillStyle = 'rgb(245, 158, 11)'; // yellow for medium
+          ctx.fillStyle = 'rgb(245, 158, 11)';
         } else {
-          ctx.fillStyle = 'rgb(34, 197, 94)'; // green for low
+          ctx.fillStyle = 'rgb(34, 197, 94)';
         }
-        
         ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
         x += barWidth + 1;
       }
-      
       if (isRecording) {
         animationFrameRef.current = requestAnimationFrame(draw);
       }
     };
-    
     draw();
   }, [isRecording]);
-
-  // Start recording
   const startRecording = useCallback(async () => {
     try {
-      console.log('🎤 [Voice Chat] Starting recording...');
+      console.log(' [Voice Chat] Starting recording...');
       setIsRecording(true);
       setCurrentTranscript('');
-      
-      // Initialize audio if not already done
       if (!streamRef.current) {
         await initializeAudioVisualization();
       }
-      
-      // Start Tauri voice transcription
       await invoke('start_continuous_voice_chat', { 
         streamId: `voice_${Date.now()}` 
       });
-      
-      // Start waveform visualization
       drawWaveform();
-      
-      // Set up silence detection for continuous mode
       if (settings.mode === 'continuous') {
         startSilenceDetection();
       }
-      
     } catch (error) {
       console.error('Failed to start recording:', error);
       setIsRecording(false);
     }
   }, [settings.mode, initializeAudioVisualization, drawWaveform]);
-
-  // Stop recording
   const stopRecording = useCallback(async () => {
     try {
-      console.log('🛑 [Voice Chat] Stopping recording...');
+      console.log(' [Voice Chat] Stopping recording...');
       setIsRecording(false);
       setIsProcessing(true);
-      
-      // Stop animation
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
-      
-      // Clear silence timer
       if (silenceTimer) {
         clearTimeout(silenceTimer);
         setSilenceTimer(null);
       }
-      
-      // Process the recorded audio
       const transcript = await invoke('vosk_transcribe') as string;
-      
       if (transcript && transcript.trim()) {
         const userMessage: VoiceMessage = {
           id: `user_${Date.now()}`,
@@ -202,29 +155,20 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
           timestamp: new Date(),
           status: 'complete'
         };
-        
         setVoiceMessages(prev => [...prev, userMessage]);
         setCurrentTranscript(transcript);
-        
-        // Notify parent component
         onTranscriptUpdate?.(transcript, true);
-        
-        // Generate AI response
         await generateVoiceResponse(transcript);
       }
-      
     } catch (error) {
       console.error('Failed to stop recording:', error);
     } finally {
       setIsProcessing(false);
     }
   }, [silenceTimer, onTranscriptUpdate]);
-
-  // Generate AI response
   const generateVoiceResponse = useCallback(async (userInput: string) => {
     try {
-      console.log('🤖 [Voice Chat] Generating AI response...');
-      
+      console.log(' [Voice Chat] Generating AI response...');
       const aiMessage: VoiceMessage = {
         id: `ai_${Date.now()}`,
         content: '',
@@ -232,15 +176,10 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
         timestamp: new Date(),
         status: 'processing'
       };
-      
       setVoiceMessages(prev => [...prev, aiMessage]);
-      
-      // Generate response using existing LLM
       const response = await invoke('generate_llm_response', { 
         prompt: userInput 
       }) as string;
-      
-      // Update message with response
       setVoiceMessages(prev => 
         prev.map(msg => 
           msg.id === aiMessage.id 
@@ -248,11 +187,7 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
             : msg
         )
       );
-      
-      // Notify parent component
       onTranscriptUpdate?.(response, false);
-      
-      // Convert to speech if auto-play is enabled
       if (settings.autoPlay) {
         await speakResponse(response, aiMessage.id);
       } else {
@@ -264,26 +199,19 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
           )
         );
       }
-      
     } catch (error) {
       console.error('Failed to generate voice response:', error);
     }
   }, [settings.autoPlay, onTranscriptUpdate]);
-
-  // Speak AI response
   const speakResponse = useCallback(async (text: string, messageId: string) => {
     try {
-      console.log('🔊 [Voice Chat] Speaking response...');
+      console.log(' [Voice Chat] Speaking response...');
       setIsSpeaking(true);
-      
-      // Use Tauri TTS
       await invoke('run_piper_tts_with_config', {
         text,
         speed: settings.playbackSpeed,
         voice: 'default'
       });
-      
-      // Update message status
       setVoiceMessages(prev => 
         prev.map(msg => 
           msg.id === messageId 
@@ -291,27 +219,21 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
             : msg
         )
       );
-      
     } catch (error) {
       console.error('Failed to speak response:', error);
     } finally {
       setIsSpeaking(false);
     }
   }, [settings.playbackSpeed]);
-
-  // Silence detection for continuous mode
   const startSilenceDetection = useCallback(() => {
     const timer = setTimeout(() => {
-      if (isRecording && audioLevel < 10) { // Low audio threshold
-        console.log('🔇 [Voice Chat] Silence detected, processing...');
+      if (isRecording && audioLevel < 10) {
+        console.log(' [Voice Chat] Silence detected, processing...');
         stopRecording();
       }
     }, settings.silenceThreshold * 1000);
-    
     setSilenceTimer(timer);
   }, [isRecording, audioLevel, settings.silenceThreshold, stopRecording]);
-
-  // Handle recording toggle
   const handleRecordingToggle = useCallback(() => {
     if (isRecording) {
       stopRecording();
@@ -319,18 +241,12 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
       startRecording();
     }
   }, [isRecording, startRecording, stopRecording]);
-
-  // Handle playback speed change
   const handleSpeedChange = (speed: number) => {
     setSettings(prev => ({ ...prev, playbackSpeed: speed }));
   };
-
-  // Handle mode change
   const handleModeChange = (mode: 'push-to-talk' | 'continuous') => {
     setSettings(prev => ({ ...prev, mode }));
   };
-
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (streamRef.current) {
@@ -347,12 +263,10 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
       }
     };
   }, [silenceTimer]);
-
   if (!isVisible) return null;
-
   return (
     <div className={cn('bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg', className)}>
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2">
           <Mic size={20} className="text-blue-600" />
@@ -371,7 +285,6 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
              isSpeaking ? 'Speaking' : 'Ready'}
           </div>
         </div>
-        
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowSettings(!showSettings)}
@@ -380,7 +293,6 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
           >
             <Settings size={16} />
           </button>
-          
           {onToggle && (
             <button
               onClick={onToggle}
@@ -392,12 +304,11 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
           )}
         </div>
       </div>
-
-      {/* Settings Panel */}
+      {}
       {showSettings && (
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
           <div className="space-y-4">
-            {/* Mode Selection */}
+            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Input Mode
@@ -427,8 +338,7 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
                 </button>
               </div>
             </div>
-
-            {/* Playback Speed */}
+            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Playback Speed: {settings.playbackSpeed}x
@@ -450,8 +360,7 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
                 ))}
               </div>
             </div>
-
-            {/* Auto-play Toggle */}
+            {}
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Auto-play responses
@@ -472,8 +381,7 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
           </div>
         </div>
       )}
-
-      {/* Audio Visualization */}
+      {}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <canvas
           ref={canvasRef}
@@ -482,8 +390,7 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
           className="w-full h-20 bg-gray-900 rounded"
         />
       </div>
-
-      {/* Recording Controls */}
+      {}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-center gap-4">
           <button
@@ -505,13 +412,11 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
               <Mic size={24} />
             )}
           </button>
-          
           {settings.mode === 'push-to-talk' && (
             <div className="text-sm text-gray-600 dark:text-gray-400">
               {isRecording ? 'Release to stop' : 'Hold to record'}
             </div>
           )}
-          
           {settings.mode === 'continuous' && (
             <div className="text-sm text-gray-600 dark:text-gray-400">
               {isRecording ? `Auto-stop in ${settings.silenceThreshold}s of silence` : 'Click to start continuous recording'}
@@ -519,8 +424,7 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
           )}
         </div>
       </div>
-
-      {/* Current Transcript */}
+      {}
       {currentTranscript && (
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20">
           <div className="text-sm text-blue-800 dark:text-blue-200">
@@ -528,8 +432,7 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
           </div>
         </div>
       )}
-
-      {/* Conversation History */}
+      {}
       <div className="flex-1 overflow-auto max-h-96">
         {voiceMessages.length === 0 ? (
           <div className="p-8 text-center text-gray-500 dark:text-gray-400">
@@ -559,7 +462,6 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
                   )}>
                     {message.isUser ? <User size={16} /> : <Bot size={16} />}
                   </div>
-                  
                   <div className={cn(
                     'p-3 rounded-lg',
                     message.isUser
@@ -571,7 +473,6 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
                       <div className="text-xs opacity-70">
                         {message.timestamp.toLocaleTimeString()}
                       </div>
-                      
                       {message.status === 'transcribing' && (
                         <Loader2 size={12} className="animate-spin" />
                       )}
@@ -581,7 +482,6 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
                       {message.status === 'speaking' && (
                         <Volume2 size={12} className="animate-pulse" />
                       )}
-                      
                       {!message.isUser && message.status === 'complete' && (
                         <button
                           onClick={() => speakResponse(message.content, message.id)}
@@ -602,5 +502,4 @@ export const VoiceChat: React.FC<VoiceChatProps> = ({
     </div>
   );
 };
-
 export default VoiceChat;

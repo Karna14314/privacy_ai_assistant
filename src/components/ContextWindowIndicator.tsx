@@ -10,7 +10,6 @@ import {
   Clock
 } from 'lucide-react';
 import { cn } from '../utils/cn';
-
 interface ContextWindowIndicatorProps {
   className?: string;
   tokenCount: number;
@@ -20,7 +19,6 @@ interface ContextWindowIndicatorProps {
   isOptimizing?: boolean;
   lastOptimization?: Date;
 }
-
 interface ContextStatus {
   level: 'safe' | 'warning' | 'critical';
   color: string;
@@ -28,7 +26,6 @@ interface ContextStatus {
   message: string;
   percentage: number;
 }
-
 export const ContextWindowIndicator: React.FC<ContextWindowIndicatorProps> = ({
   className,
   tokenCount,
@@ -40,11 +37,8 @@ export const ContextWindowIndicator: React.FC<ContextWindowIndicatorProps> = ({
 }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [animationClass, setAnimationClass] = useState('');
-
-  // Calculate context status
   const getContextStatus = (): ContextStatus => {
     const percentage = (tokenCount / maxTokens) * 100;
-    
     if (percentage >= 90) {
       return {
         level: 'critical',
@@ -71,34 +65,25 @@ export const ContextWindowIndicator: React.FC<ContextWindowIndicatorProps> = ({
       };
     }
   };
-
   const status = getContextStatus();
-
-  // Format token count with commas
   const formatTokenCount = (count: number): string => {
     return count.toLocaleString();
   };
-
-  // Calculate estimated tokens remaining
   const tokensRemaining = Math.max(0, maxTokens - tokenCount);
-
-  // Handle optimization animation
   useEffect(() => {
     if (isOptimizing) {
       setAnimationClass('animate-pulse');
     } else {
       setAnimationClass('');
-      // Brief success animation when optimization completes
       setTimeout(() => {
         setAnimationClass('animate-bounce');
         setTimeout(() => setAnimationClass(''), 1000);
       }, 100);
     }
   }, [isOptimizing]);
-
   return (
     <div className={cn('bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg', className)}>
-      {/* Main Indicator */}
+      {}
       <div 
         className={cn(
           'p-3 cursor-pointer transition-all duration-200',
@@ -127,12 +112,11 @@ export const ContextWindowIndicator: React.FC<ContextWindowIndicatorProps> = ({
               </div>
             </div>
           </div>
-          
           <div className="flex items-center gap-2">
-            {/* Circular Progress */}
+            {}
             <div className="relative w-12 h-12">
               <svg className="w-12 h-12 transform -rotate-90" viewBox="0 0 36 36">
-                {/* Background circle */}
+                {}
                 <path
                   className="text-gray-200 dark:text-gray-700"
                   stroke="currentColor"
@@ -140,7 +124,7 @@ export const ContextWindowIndicator: React.FC<ContextWindowIndicatorProps> = ({
                   fill="transparent"
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
-                {/* Progress circle */}
+                {}
                 <path
                   className={status.color}
                   stroke="currentColor"
@@ -157,24 +141,21 @@ export const ContextWindowIndicator: React.FC<ContextWindowIndicatorProps> = ({
                 </span>
               </div>
             </div>
-            
-            {/* Status Icon */}
+            {}
             {status.level === 'critical' && <AlertTriangle size={16} className={status.color} />}
             {status.level === 'warning' && <TrendingUp size={16} className={status.color} />}
             {status.level === 'safe' && <CheckCircle size={16} className={status.color} />}
           </div>
         </div>
-
-        {/* Status Message */}
+        {}
         <div className={cn('mt-2 text-xs', status.color)}>
           {status.message}
         </div>
       </div>
-
-      {/* Detailed View */}
+      {}
       {showDetails && (
         <div className="border-t border-gray-200 dark:border-gray-700 p-3 space-y-3">
-          {/* Token Statistics */}
+          {}
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div className="bg-gray-50 dark:bg-gray-800 p-2 rounded">
               <div className="text-gray-600 dark:text-gray-400">Used</div>
@@ -189,8 +170,7 @@ export const ContextWindowIndicator: React.FC<ContextWindowIndicatorProps> = ({
               </div>
             </div>
           </div>
-
-          {/* Progress Bar */}
+          {}
           <div className="space-y-1">
             <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
               <span>Memory Usage</span>
@@ -207,8 +187,7 @@ export const ContextWindowIndicator: React.FC<ContextWindowIndicatorProps> = ({
               />
             </div>
           </div>
-
-          {/* Last Optimization */}
+          {}
           {lastOptimization && (
             <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
               <Clock size={12} />
@@ -217,8 +196,7 @@ export const ContextWindowIndicator: React.FC<ContextWindowIndicatorProps> = ({
               </span>
             </div>
           )}
-
-          {/* Action Buttons */}
+          {}
           <div className="flex gap-2 pt-2">
             {status.level !== 'safe' && (
               <button
@@ -233,7 +211,6 @@ export const ContextWindowIndicator: React.FC<ContextWindowIndicatorProps> = ({
                 Optimize Memory
               </button>
             )}
-            
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -246,8 +223,7 @@ export const ContextWindowIndicator: React.FC<ContextWindowIndicatorProps> = ({
               Clear All
             </button>
           </div>
-
-          {/* Information */}
+          {}
           <div className="bg-blue-50 dark:bg-blue-900/20 p-2 rounded text-xs">
             <div className="flex items-start gap-2">
               <Info size={12} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
@@ -265,5 +241,4 @@ export const ContextWindowIndicator: React.FC<ContextWindowIndicatorProps> = ({
     </div>
   );
 };
-
 export default ContextWindowIndicator;

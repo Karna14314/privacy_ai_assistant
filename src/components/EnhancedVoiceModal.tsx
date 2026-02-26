@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import { useEnhancedVoice } from '../hooks/useEnhancedVoice';
 import { useSettingsStore } from '../stores/settingsStore';
-
 interface EnhancedVoiceModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -25,7 +24,6 @@ interface EnhancedVoiceModalProps {
   onSendMessage?: (text: string) => void;
   autoSend?: boolean;
 }
-
 const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
   isOpen,
   onClose,
@@ -35,7 +33,6 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
 }) => {
   const [showSettings, setShowSettings] = useState(false);
   const [editableTranscription, setEditableTranscription] = useState('');
-  
   const { settings, updateVoiceConfig } = useSettingsStore();
   const {
     voiceState,
@@ -47,21 +44,16 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
     setVoice,
     requestMicrophonePermission
   } = useEnhancedVoice();
-
-  // Update editable transcription when voice state changes
   useEffect(() => {
     if (voiceState.transcription) {
       setEditableTranscription(voiceState.transcription);
     }
   }, [voiceState.transcription]);
-
-  // Auto-send functionality
   useEffect(() => {
     if (autoSend && voiceState.transcription && !voiceState.isRecording && voiceState.confidence > 0.7) {
       handleSendTranscription();
     }
   }, [autoSend, voiceState.transcription, voiceState.isRecording, voiceState.confidence]);
-
   const handleStartRecording = async () => {
     try {
       await startRecording();
@@ -69,7 +61,6 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
       console.error('Failed to start recording:', error);
     }
   };
-
   const handleStopRecording = async () => {
     try {
       await stopRecording();
@@ -77,17 +68,13 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
       console.error('Failed to stop recording:', error);
     }
   };
-
   const handleSendTranscription = () => {
     const text = editableTranscription.trim();
     if (text) {
-      // FIXED: Only call onTranscriptionComplete, not both callbacks
-      // This prevents duplicate message sending
       onTranscriptionComplete(text);
       onClose();
     }
   };
-
   const handleTestTTS = async () => {
     if (editableTranscription.trim()) {
       try {
@@ -97,15 +84,12 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
       }
     }
   };
-
   const handleVoiceProviderChange = (provider: 'web-speech' | 'vosk' | 'whisper') => {
     updateVoiceConfig({ voiceProvider: provider });
   };
-
   const handleLanguageChange = (language: string) => {
     updateVoiceConfig({ sttLanguage: language });
   };
-
   const handleVoiceChange = (voiceName: string) => {
     const voices = getAvailableVoices();
     const selectedVoice = voices.find(voice => voice.name === voiceName);
@@ -113,25 +97,21 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
       setVoice(selectedVoice);
     }
   };
-
   const getConfidenceColor = (confidence: number) => {
     if (confidence >= 0.8) return 'text-green-600';
     if (confidence >= 0.6) return 'text-yellow-600';
     return 'text-red-600';
   };
-
   const getConfidenceIcon = (confidence: number) => {
     if (confidence >= 0.8) return CheckCircle;
     if (confidence >= 0.6) return AlertCircle;
     return AlertCircle;
   };
-
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
             Enhanced Voice Input
@@ -154,12 +134,11 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
             </button>
           </div>
         </div>
-
-        {/* Settings Panel */}
+        {}
         {showSettings && (
           <div className="p-6 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Voice Provider */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Voice Provider
@@ -174,8 +153,7 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
                   <option value="whisper">Whisper (Tauri)</option>
                 </select>
               </div>
-
-              {/* Language */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Language
@@ -197,8 +175,7 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
                   <option value="zh-CN">Chinese (Simplified)</option>
                 </select>
               </div>
-
-              {/* TTS Voice */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   TTS Voice
@@ -215,8 +192,7 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
                   ))}
                 </select>
               </div>
-
-              {/* Auto-play TTS */}
+              {}
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -232,10 +208,9 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
             </div>
           </div>
         )}
-
-        {/* Main Content */}
+        {}
         <div className="p-6">
-          {/* Recording Controls */}
+          {}
           <div className="flex items-center justify-center space-x-4 mb-6">
             <button
               type="button"
@@ -257,8 +232,7 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
                 <Mic size={24} />
               )}
             </button>
-
-            {/* TTS Controls */}
+            {}
             <button
               type="button"
               onClick={voiceState.isTTSPlaying ? stopSpeaking : handleTestTTS}
@@ -274,12 +248,11 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
               {voiceState.isTTSPlaying ? <VolumeX size={20} /> : <Volume2 size={20} />}
             </button>
           </div>
-
-          {/* Status */}
+          {}
           <div className="text-center mb-4">
             {voiceState.isRecording && (
               <p className="text-blue-600 dark:text-blue-400 font-medium">
-                🎤 Listening... Speak now
+                 Listening... Speak now
               </p>
             )}
             {voiceState.isProcessing && (
@@ -289,7 +262,7 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
             )}
             {voiceState.isTTSPlaying && (
               <p className="text-green-600 dark:text-green-400 font-medium">
-                🔊 Playing text-to-speech...
+                 Playing text-to-speech...
               </p>
             )}
             {voiceState.error && (
@@ -298,8 +271,7 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
               </p>
             )}
           </div>
-
-          {/* Transcription */}
+          {}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -324,8 +296,7 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
               className="w-full h-32 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-
-          {/* Action Buttons */}
+          {}
           <div className="flex items-center justify-end space-x-3">
             <button
               type="button"
@@ -352,5 +323,4 @@ const EnhancedVoiceModal: React.FC<EnhancedVoiceModalProps> = ({
     </div>
   );
 };
-
 export default EnhancedVoiceModal;

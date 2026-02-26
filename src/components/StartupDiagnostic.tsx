@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, AlertCircle, Loader2, RefreshCw, Settings } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { cn } from '../utils/cn';
-
 interface DiagnosticStep {
   id: string;
   name: string;
@@ -13,12 +12,10 @@ interface DiagnosticStep {
   critical: boolean;
   runCheck: () => Promise<boolean>;
 }
-
 interface StartupDiagnosticProps {
   onDiagnosticComplete: (success: boolean) => void;
   className?: string;
 }
-
 export const StartupDiagnostic: React.FC<StartupDiagnosticProps> = ({
   onDiagnosticComplete,
   className = '',
@@ -26,13 +23,11 @@ export const StartupDiagnostic: React.FC<StartupDiagnosticProps> = ({
   const [steps, setSteps] = useState<Omit<DiagnosticStep, 'runCheck'>[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
-
   const updateStepStatus = (id: string, status: DiagnosticStep['status'], data: Partial<DiagnosticStep> = {}) => {
     setSteps(prev =>
       prev.map(step => (step.id === id ? { ...step, status, ...data } : step))
     );
   };
-
   const diagnosticChecks: DiagnosticStep[] = [
     {
       id: 'backend',
@@ -91,10 +86,7 @@ export const StartupDiagnostic: React.FC<StartupDiagnosticProps> = ({
       critical: true,
       runCheck: async () => {
         try {
-          // Add a longer timeout and retry logic for model loading
-          console.log('🧪 Testing Gemma 3n model...');
-
-          // First, warm up the model with a simple request
+          console.log(' Testing Gemma 3n model...');
           try {
             const warmupResult = await invoke('test_gemma_model');
             if (warmupResult) {
@@ -104,10 +96,7 @@ export const StartupDiagnostic: React.FC<StartupDiagnosticProps> = ({
           } catch (warmupError) {
             console.warn('⚠️ First attempt failed, retrying...', warmupError);
           }
-
-          // Retry after a brief delay to allow model loading
           await new Promise(resolve => setTimeout(resolve, 2000));
-
           const isReady = await invoke('test_gemma_model');
           if (isReady) {
             updateStepStatus('gemma', 'success', { details: 'Gemma 3n model is responsive (after retry).' });
@@ -136,25 +125,19 @@ export const StartupDiagnostic: React.FC<StartupDiagnosticProps> = ({
       status: 'pending',
       critical: false,
       runCheck: async () => {
-        // This check is a placeholder. A real implementation would
-        // involve checking for audio devices.
         updateStepStatus('audio', 'success', { details: 'Audio system appears to be ready.' });
         return true;
       },
     },
   ];
-
   useEffect(() => {
     setSteps(diagnosticChecks.map(({ runCheck, ...rest }) => rest));
     runDiagnostics();
   }, []);
-
   const runDiagnostics = async () => {
     if (isRunning) return;
     setIsRunning(true);
-
     let allCriticalPassed = true;
-
     for (const check of diagnosticChecks) {
       updateStepStatus(check.id, 'checking');
       const success = await check.runCheck();
@@ -162,11 +145,9 @@ export const StartupDiagnostic: React.FC<StartupDiagnosticProps> = ({
         allCriticalPassed = false;
       }
     }
-
     setIsRunning(false);
     onDiagnosticComplete(allCriticalPassed);
   };
-
   const getStepIcon = (step: Omit<DiagnosticStep, 'runCheck'>) => {
     switch (step.status) {
       case 'checking':
@@ -179,7 +160,6 @@ export const StartupDiagnostic: React.FC<StartupDiagnosticProps> = ({
         return <AlertCircle className="w-5 h-5 text-gray-400" />;
     }
   };
-
   return (
     <div className={cn('bg-white dark:bg-gray-800 rounded-lg shadow-lg', className)}>
       <div className="p-6">
@@ -208,7 +188,6 @@ export const StartupDiagnostic: React.FC<StartupDiagnosticProps> = ({
             </button>
           </div>
         </div>
-
         <div className="space-y-4">
           {steps.map((step) => (
             <div key={step.id} className="flex items-start space-x-3">
@@ -246,5 +225,4 @@ export const StartupDiagnostic: React.FC<StartupDiagnosticProps> = ({
     </div>
   );
 };
-
 export default StartupDiagnostic;

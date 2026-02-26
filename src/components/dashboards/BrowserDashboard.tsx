@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { X, Globe, Search, ExternalLink, History, Bookmark, RefreshCw, ArrowLeft, ArrowRight } from 'lucide-react';
 import { cn } from '../../utils/cn';
-
 interface BrowserDashboardProps {
   onClose: () => void;
   onExecute: (data: any) => Promise<{ success: boolean; message: string }>;
 }
-
 interface BrowserHistory {
   id: string;
   url: string;
   title: string;
   timestamp: Date;
 }
-
 interface Bookmark {
   id: string;
   url: string;
@@ -21,7 +18,6 @@ interface Bookmark {
   category: string;
   createdAt: Date;
 }
-
 const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute }) => {
   const [activeTab, setActiveTab] = useState<'browse' | 'history' | 'bookmarks' | 'settings'>('browse');
   const [currentUrl, setCurrentUrl] = useState('https://www.google.com');
@@ -31,17 +27,13 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error' | 'loading'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
-
-  // Load saved data
   useEffect(() => {
     loadBrowserData();
   }, []);
-
   const loadBrowserData = () => {
     try {
       const savedHistory = localStorage.getItem('browser_history');
       const savedBookmarks = localStorage.getItem('browser_bookmarks');
-      
       if (savedHistory) {
         const parsed = JSON.parse(savedHistory);
         setBrowserHistory(parsed.map((item: any) => ({
@@ -49,7 +41,6 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
           timestamp: new Date(item.timestamp)
         })));
       }
-      
       if (savedBookmarks) {
         const parsed = JSON.parse(savedBookmarks);
         setBookmarks(parsed.map((item: any) => ({
@@ -61,7 +52,6 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
       console.error('Failed to load browser data:', error);
     }
   };
-
   const saveBrowserData = () => {
     try {
       localStorage.setItem('browser_history', JSON.stringify(browserHistory));
@@ -70,30 +60,23 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
       console.error('Failed to save browser data:', error);
     }
   };
-
   const handleNavigate = async (url: string) => {
     setIsLoading(true);
     setStatus('loading');
     setStatusMessage('Navigating...');
-
     try {
-      // Add to history
       const newHistoryItem: BrowserHistory = {
         id: Date.now().toString(),
         url,
         title: `Page at ${url}`,
         timestamp: new Date()
       };
-      
-      setBrowserHistory(prev => [newHistoryItem, ...prev.slice(0, 49)]); // Keep last 50 items
+      setBrowserHistory(prev => [newHistoryItem, ...prev.slice(0, 49)]);
       setCurrentUrl(url);
-      
-      // Execute browser action
       const result = await onExecute({
         toolData: { action: 'navigate', url },
         context: { currentUrl, history: browserHistory }
       });
-
       if (result.success) {
         setStatus('success');
         setStatusMessage('Navigation successful');
@@ -109,14 +92,12 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
       setTimeout(() => setStatus('idle'), 3000);
     }
   };
-
   const handleSearch = () => {
     if (searchQuery.trim()) {
       const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
       handleNavigate(searchUrl);
     }
   };
-
   const addBookmark = () => {
     if (currentUrl.trim()) {
       const newBookmark: Bookmark = {
@@ -126,33 +107,28 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
         category: 'General',
         createdAt: new Date()
       };
-      
       setBookmarks(prev => [...prev, newBookmark]);
       saveBrowserData();
     }
   };
-
   const removeBookmark = (id: string) => {
     setBookmarks(prev => prev.filter(bookmark => bookmark.id !== id));
     saveBrowserData();
   };
-
   const clearHistory = () => {
     setBrowserHistory([]);
     saveBrowserData();
   };
-
   const tabs = [
     { id: 'browse', label: 'Browse', icon: Globe },
     { id: 'history', label: 'History', icon: History },
     { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
     { id: 'settings', label: 'Settings', icon: RefreshCw }
   ];
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-6xl h-[90vh] flex flex-col">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
             <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
@@ -174,8 +150,7 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
             <X size={20} />
           </button>
         </div>
-
-        {/* Status Bar */}
+        {}
         {status !== 'idle' && (
           <div className={cn(
             "px-6 py-3 flex items-center space-x-2 transition-all duration-300",
@@ -189,8 +164,7 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
             <span className="text-sm font-medium">{statusMessage}</span>
           </div>
         )}
-
-        {/* Tabs */}
+        {}
         <div className="flex border-b border-gray-200 dark:border-gray-700">
           {tabs.map(tab => (
             <button
@@ -208,12 +182,11 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
             </button>
           ))}
         </div>
-
-        {/* Content */}
+        {}
         <div className="flex-1 overflow-y-auto p-6">
           {activeTab === 'browse' && (
             <div className="space-y-6">
-              {/* Navigation Bar */}
+              {}
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => handleNavigate(currentUrl)}
@@ -238,8 +211,7 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
                   Go
                 </button>
               </div>
-
-              {/* Search Bar */}
+              {}
               <div className="flex items-center space-x-2">
                 <Search className="w-5 h-5 text-gray-400" />
                 <input
@@ -258,8 +230,7 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
                   Search
                 </button>
               </div>
-
-              {/* Quick Actions */}
+              {}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <button
                   onClick={() => handleNavigate('https://www.google.com')}
@@ -290,8 +261,7 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
                   <span className="text-sm font-medium">Add Bookmark</span>
                 </button>
               </div>
-
-              {/* Browser Preview */}
+              {}
               <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-medium text-gray-900 dark:text-gray-100">Browser Preview</h3>
@@ -307,7 +277,6 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
               </div>
             </div>
           )}
-
           {activeTab === 'history' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -319,7 +288,6 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
                   Clear History
                 </button>
               </div>
-              
               {browserHistory.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                   <History className="w-12 h-12 mx-auto mb-2 opacity-50" />
@@ -355,11 +323,9 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
               )}
             </div>
           )}
-
           {activeTab === 'bookmarks' && (
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Bookmarks</h3>
-              
               {bookmarks.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                   <Bookmark className="w-12 h-12 mx-auto mb-2 opacity-50" />
@@ -403,11 +369,9 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
               )}
             </div>
           )}
-
           {activeTab === 'settings' && (
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Browser Settings</h3>
-              
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -419,7 +383,6 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
                     <option value="duckduckgo">DuckDuckGo</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Homepage
@@ -431,7 +394,6 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
                     placeholder="Enter homepage URL"
                   />
                 </div>
-
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -442,7 +404,6 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
                     Clear history when closing browser
                   </label>
                 </div>
-
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -462,5 +423,4 @@ const BrowserDashboard: React.FC<BrowserDashboardProps> = ({ onClose, onExecute 
     </div>
   );
 };
-
-export default BrowserDashboard; 
+export default BrowserDashboard;

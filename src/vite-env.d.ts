@@ -1,5 +1,3 @@
-/// <reference types="vite/client" />
-
 interface ImportMetaEnv {
   readonly VITE_GEMINI_API_KEY: string
   readonly VITE_ENABLE_VOICE_FEATURES: string
@@ -11,7 +9,6 @@ interface ImportMetaEnv {
   readonly TAURI_PLATFORM_VERSION: string
   readonly TAURI_PLATFORM_TYPE: string
 }
-
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }

@@ -13,29 +13,25 @@ import {
 import { cn } from '../utils/cn';
 import { ModelProvider, llmRouter } from '../core/agents/llmRouter';
 import { geminiApi } from '../services/geminiApi';
-
 interface ModelSelectorProps {
   className?: string;
   onProviderChange?: (provider: ModelProvider) => void;
 }
-
 interface ConnectivityInfo {
   isOnline: boolean;
   latency: number;
   geminiReachable: boolean;
   lastCheck: Date;
 }
-
 interface ModelOption {
   provider: ModelProvider;
   name: string;
   description: string;
-  icon: any; // LucideIcon type
+  icon: any;
   estimatedTime: number;
   available: boolean;
   reason?: string;
 }
-
 export const ModelSelector: React.FC<ModelSelectorProps> = ({
   className,
   onProviderChange
@@ -50,8 +46,6 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
     lastCheck: new Date()
   });
   const [isTestingConnectivity, setIsTestingConnectivity] = useState(false);
-
-  // Update connectivity status
   const updateConnectivity = async () => {
     const status = llmRouter.getConnectivityStatus();
     setConnectivity({
@@ -61,8 +55,6 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       lastCheck: status.lastCheck
     });
   };
-
-  // Test connectivity manually
   const testConnectivity = async () => {
     setIsTestingConnectivity(true);
     try {
@@ -74,24 +66,17 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       setIsTestingConnectivity(false);
     }
   };
-
-  // Handle provider selection
   const handleProviderChange = (provider: ModelProvider) => {
     setSelectedProvider(provider);
     llmRouter.setProvider(provider);
     onProviderChange?.(provider);
-    console.log(`🤖 [Model Selector] Provider changed to: ${provider}`);
+    console.log(` [Model Selector] Provider changed to: ${provider}`);
   };
-
-  // Update connectivity status periodically
   useEffect(() => {
     updateConnectivity();
-    
-    const interval = setInterval(updateConnectivity, 10000); // Every 10 seconds
+    const interval = setInterval(updateConnectivity, 10000);
     return () => clearInterval(interval);
   }, []);
-
-  // Define model options
   const modelOptions: ModelOption[] = [
     {
       provider: ModelProvider.LOCAL_GEMMA3N,
@@ -127,16 +112,14 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
         : 'Local fallback available'
     }
   ];
-
   return (
     <div className={cn('bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 relative z-10', className)}>
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
           Model Selection
         </h3>
-        
-        {/* Connectivity Status */}
+        {}
         <div className="flex items-center gap-2">
           <div className={cn(
             'flex items-center gap-1 px-2 py-1 rounded-full text-xs',
@@ -153,7 +136,6 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
               {connectivity.isOnline ? 'Online' : 'Offline'}
             </span>
           </div>
-          
           <button
             onClick={testConnectivity}
             disabled={isTestingConnectivity}
@@ -168,13 +150,11 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
           </button>
         </div>
       </div>
-
-      {/* Model Options */}
+      {}
       <div className="space-y-3">
         {modelOptions.map((option) => {
           const isSelected = selectedProvider === option.provider;
           const IconComponent = option.icon;
-          
           return (
             <div
               key={option.provider}
@@ -187,7 +167,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
               )}
               onClick={() => option.available && handleProviderChange(option.provider)}
             >
-              {/* Radio Button */}
+              {}
               <div className="flex items-start gap-3">
                 <div className={cn(
                   'w-4 h-4 rounded-full border-2 flex items-center justify-center mt-0.5',
@@ -199,8 +179,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                     <div className="w-2 h-2 rounded-full bg-white" />
                   )}
                 </div>
-                
-                {/* Content */}
+                {}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <IconComponent size={16} className={cn(
@@ -209,27 +188,23 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                     <span className="font-medium text-sm text-gray-900 dark:text-gray-100">
                       {option.name}
                     </span>
-                    
-                    {/* Availability Indicator */}
+                    {}
                     {option.available ? (
                       <CheckCircle size={14} className="text-green-500" />
                     ) : (
                       <AlertCircle size={14} className="text-red-500" />
                     )}
                   </div>
-                  
                   <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
                     {option.description}
                   </p>
-                  
-                  {/* Status and Timing */}
+                  {}
                   <div className="flex items-center justify-between text-xs">
                     <span className={cn(
                       option.available ? 'text-green-600' : 'text-red-600'
                     )}>
                       {option.reason}
                     </span>
-                    
                     {option.available && (
                       <span className="text-gray-500">
                         ~{option.estimatedTime}ms
@@ -242,15 +217,13 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
           );
         })}
       </div>
-
-      {/* Additional Info */}
+      {}
       <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <div className="text-xs text-gray-600 dark:text-gray-400">
           <div className="flex items-center justify-between mb-1">
             <span>Last connectivity check:</span>
             <span>{connectivity.lastCheck.toLocaleTimeString()}</span>
           </div>
-          
           {connectivity.isOnline && (
             <div className="flex items-center justify-between">
               <span>Network latency:</span>
@@ -264,8 +237,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
           )}
         </div>
       </div>
-
-      {/* Current Selection Summary */}
+      {}
       <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-200 dark:border-blue-800">
         <div className="text-xs text-blue-800 dark:text-blue-200">
           <strong>Active:</strong> {modelOptions.find(opt => opt.provider === selectedProvider)?.name}
@@ -274,5 +246,4 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
     </div>
   );
 };
-
 export default ModelSelector;

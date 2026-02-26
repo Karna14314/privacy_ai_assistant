@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { toolMetricsService } from '../services/toolMetricsService';
-
 interface ToolData {
   id: string;
   title: string;
@@ -24,16 +23,14 @@ interface ToolData {
   updatedAt: Date;
   metadata?: Record<string, any>;
 }
-
 interface ToolDashboardProps {
   toolName: string;
-  toolIcon: any; // LucideIcon type
+  toolIcon: any;
   toolColor: string;
   description: string;
   onClose: () => void;
   onExecute?: (data: any) => Promise<any>;
 }
-
 const ToolDashboard: React.FC<ToolDashboardProps> = ({
   toolName,
   toolIcon: IconComponent,
@@ -50,12 +47,9 @@ const ToolDashboard: React.FC<ToolDashboardProps> = ({
   const [status, setStatus] = useState<'idle' | 'success' | 'error' | 'loading'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
-
-  // Load existing data for this tool
   useEffect(() => {
     loadToolData();
   }, [toolName]);
-
   const loadToolData = () => {
     try {
       const savedData = localStorage.getItem(`tool_data_${toolName}`);
@@ -71,7 +65,6 @@ const ToolDashboard: React.FC<ToolDashboardProps> = ({
       console.error('Failed to load tool data:', error);
     }
   };
-
   const saveToolData = (data: ToolData[]) => {
     try {
       localStorage.setItem(`tool_data_${toolName}`, JSON.stringify(data));
@@ -79,14 +72,12 @@ const ToolDashboard: React.FC<ToolDashboardProps> = ({
       console.error('Failed to save tool data:', error);
     }
   };
-
   const handleAddData = () => {
     if (!newDataTitle.trim() || !newDataContent.trim()) {
       setStatus('error');
       setStatusMessage('Please fill in both title and content');
       return;
     }
-
     const newData: ToolData = {
       id: Date.now().toString(),
       title: newDataTitle.trim(),
@@ -94,32 +85,25 @@ const ToolDashboard: React.FC<ToolDashboardProps> = ({
       createdAt: new Date(),
       updatedAt: new Date()
     };
-
     const updatedData = [...toolData, newData];
     setToolData(updatedData);
     saveToolData(updatedData);
-    
     setNewDataTitle('');
     setNewDataContent('');
     setStatus('success');
     setStatusMessage('Data added successfully');
-    
     setTimeout(() => setStatus('idle'), 3000);
   };
-
   const handleDeleteData = (id: string) => {
     const updatedData = toolData.filter(item => item.id !== id);
     setToolData(updatedData);
     saveToolData(updatedData);
   };
-
   const handleExecuteTool = async () => {
     if (!onExecute) return;
-
     setIsExecuting(true);
     setStatus('loading');
     setStatusMessage('Executing tool...');
-
     try {
       const result = await toolMetricsService.recordToolAction(
         toolName,
@@ -130,18 +114,13 @@ const ToolDashboard: React.FC<ToolDashboardProps> = ({
           context: formatToolDataForLLM(toolData)
         })
       );
-
       setStatus('success');
       setStatusMessage(result?.message || 'Tool executed successfully');
-
-      // Update health status on success
       toolMetricsService.updateHealthStatus({
         toolName,
         isHealthy: true,
         lastCheck: new Date()
       });
-
-      // Add visual feedback with animation
       setTimeout(() => {
         setStatus('idle');
         setStatusMessage('');
@@ -149,16 +128,12 @@ const ToolDashboard: React.FC<ToolDashboardProps> = ({
     } catch (error) {
       setStatus('error');
       setStatusMessage(error instanceof Error ? error.message : 'Execution failed');
-
-      // Update health status on error
       toolMetricsService.updateHealthStatus({
         toolName,
         isHealthy: false,
         lastCheck: new Date(),
         errorMessage: error instanceof Error ? error.message : String(error)
       });
-
-      // Keep error message longer
       setTimeout(() => {
         setStatus('idle');
         setStatusMessage('');
@@ -167,59 +142,45 @@ const ToolDashboard: React.FC<ToolDashboardProps> = ({
       setIsExecuting(false);
     }
   };
-
   const formatToolDataForLLM = (data: ToolData[]): string => {
     if (data.length === 0) return 'No data available for this tool.';
-
     let formatted = `=== ${toolName.toUpperCase()} DATA ===\n`;
     formatted += `Total items: ${data.length}\n`;
     formatted += `Last updated: ${new Date().toLocaleString()}\n\n`;
-
     data.forEach((item, index) => {
       formatted += `${index + 1}. ${item.title}\n`;
       formatted += `   Content: ${item.content}\n`;
       formatted += `   Created: ${item.createdAt.toLocaleDateString()}\n`;
       formatted += `   Last Modified: ${item.updatedAt.toLocaleDateString()}\n`;
-
       if (item.metadata && Object.keys(item.metadata).length > 0) {
         formatted += `   Metadata: ${JSON.stringify(item.metadata)}\n`;
       }
-
       formatted += '\n';
     });
-
     formatted += `=== END ${toolName.toUpperCase()} DATA ===`;
-
     return formatted;
   };
-
   const handleSendToChat = () => {
     if (toolData.length === 0) {
       setStatus('error');
       setStatusMessage('No data to send to chat');
       return;
     }
-
     const contextMessage = `Here's the data from my ${toolName}:\n\n${formatToolDataForLLM(toolData)}`;
-
-    // This would trigger sending the context to the chat
-    // For now, we'll copy to clipboard
     navigator.clipboard.writeText(contextMessage);
     setStatus('success');
     setStatusMessage('Tool data copied to clipboard - paste in chat to use');
     setTimeout(() => setStatus('idle'), 3000);
   };
-
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Activity },
     { id: 'data', label: 'Data', icon: Database },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-4xl h-[80vh] flex flex-col">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
             <div className={cn("p-2 rounded-lg", `bg-${toolColor}-100 dark:bg-${toolColor}-900/30`)}>
@@ -241,8 +202,7 @@ const ToolDashboard: React.FC<ToolDashboardProps> = ({
             <X size={20} />
           </button>
         </div>
-
-        {/* Enhanced Status Bar */}
+        {}
         {status !== 'idle' && (
           <div className={cn(
             "px-6 py-3 flex items-center space-x-2 transition-all duration-300",
@@ -263,8 +223,7 @@ const ToolDashboard: React.FC<ToolDashboardProps> = ({
             )}
           </div>
         )}
-
-        {/* Tabs */}
+        {}
         <div className="flex border-b border-gray-200 dark:border-gray-700">
           {tabs.map(tab => (
             <button
@@ -282,8 +241,7 @@ const ToolDashboard: React.FC<ToolDashboardProps> = ({
             </button>
           ))}
         </div>
-
-        {/* Content */}
+        {}
         <div className="flex-1 overflow-y-auto p-6">
           {activeTab === 'overview' && (
             <div className="space-y-6">
@@ -315,7 +273,6 @@ const ToolDashboard: React.FC<ToolDashboardProps> = ({
                   </p>
                 </div>
               </div>
-
               <div className="flex space-x-4">
                 <button
                   onClick={handleExecuteTool}
@@ -336,10 +293,9 @@ const ToolDashboard: React.FC<ToolDashboardProps> = ({
               </div>
             </div>
           )}
-
           {activeTab === 'data' && (
             <div className="space-y-6">
-              {/* Add New Data */}
+              {}
               <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
                 <h3 className="text-lg font-medium mb-4 flex items-center space-x-2">
                   <Plus size={20} />
@@ -369,8 +325,7 @@ const ToolDashboard: React.FC<ToolDashboardProps> = ({
                   </button>
                 </div>
               </div>
-
-              {/* Existing Data */}
+              {}
               <div>
                 <h3 className="text-lg font-medium mb-4">Saved Data</h3>
                 {toolData.length === 0 ? (
@@ -404,7 +359,6 @@ const ToolDashboard: React.FC<ToolDashboardProps> = ({
               </div>
             </div>
           )}
-
           {activeTab === 'settings' && (
             <div className="space-y-6">
               <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
@@ -441,5 +395,4 @@ const ToolDashboard: React.FC<ToolDashboardProps> = ({
     </div>
   );
 };
-
 export default ToolDashboard;

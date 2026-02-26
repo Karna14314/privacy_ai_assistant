@@ -41,7 +41,6 @@ import PersonalInfoDashboard from './dashboards/PersonalInfoDashboard';
 import ModelSelector from './ModelSelector';
 import EmbeddedBrowser from './EmbeddedBrowser';
 import CapabilitiesStatusPanel from './CapabilitiesStatusPanel';
-
 interface ChatItemProps {
   session: ChatSessionSummary;
   isActive: boolean;
@@ -52,7 +51,6 @@ interface ChatItemProps {
   onExport: (chatId: string) => void;
   onArchive: (chatId: string) => void;
 }
-
 const ChatItem: React.FC<ChatItemProps> = ({
   session,
   isActive,
@@ -68,39 +66,33 @@ const ChatItem: React.FC<ChatItemProps> = ({
   const [showMenu, setShowMenu] = useState(false);
   const editInputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     if (isEditing && editInputRef.current) {
       editInputRef.current.focus();
       editInputRef.current.select();
     }
   }, [isEditing]);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setShowMenu(false);
       }
     };
-
     if (showMenu) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [showMenu]);
-
   const handleSaveEdit = () => {
     if (editTitle.trim() && editTitle !== session.title) {
       onRename(session.id, editTitle.trim());
     }
     setIsEditing(false);
   };
-
   const handleCancelEdit = () => {
     setEditTitle(session.title);
     setIsEditing(false);
   };
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSaveEdit();
@@ -108,19 +100,15 @@ const ChatItem: React.FC<ChatItemProps> = ({
       handleCancelEdit();
     }
   };
-
   const formatLastActivity = (date: Date | null | undefined) => {
     if (!date) return 'No activity';
-    
     const activityDate = date instanceof Date ? date : new Date(date);
     if (isNaN(activityDate.getTime())) return 'Invalid date';
-
     const now = new Date();
     const diff = now.getTime() - activityDate.getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor(diff / (1000 * 60));
-
     if (minutes < 1) return 'Just now';
     if (minutes < 60) return `${minutes}m ago`;
     if (hours < 24) return `${hours}h ago`;
@@ -128,7 +116,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
     if (days < 7) return `${days}d ago`;
     return activityDate.toLocaleDateString();
   };
-
   return (
     <div
       className={cn(
@@ -174,7 +161,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
                   {session.title}
                 </h3>
               </div>
-              
               {session.lastMessage && (
                 <p className="mt-1 text-xs text-gray-600 dark:text-gray-400 truncate">
                   {session.lastMessage.length > 60
@@ -182,7 +168,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
                     : session.lastMessage}
                 </p>
               )}
-
               <div className="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                 <div className="flex items-center space-x-2">
                   <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-xs">
@@ -194,7 +179,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
             </>
           )}
         </div>
-
         {!isEditing && (
           <div className="relative">
             <button
@@ -207,7 +191,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
             >
               <MoreHorizontal size={16} />
             </button>
-
             {showMenu && (
               <div
                 ref={menuRef}
@@ -281,7 +264,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
     </div>
   );
 };
-
 const EnhancedSidebar: React.FC = () => {
   const [showSidebar, setShowSidebar] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -299,11 +281,8 @@ const EnhancedSidebar: React.FC = () => {
       return ModelProvider.LOCAL_GEMMA3N;
     }
   });
-  
   const { preferences, setTheme } = useAppStore();
   const { settings, updateUIPreferences } = useSettingsStore();
-
-  // Get store values first
   const {
     chatSummaries,
     chatSessions,
@@ -320,18 +299,14 @@ const EnhancedSidebar: React.FC = () => {
     isInitialized,
     initializeStore
   } = useEnhancedChatStore();
-
-  // Initialize chat store when component mounts
   useEffect(() => {
     if (!isInitialized) {
-      console.log('🔄 Initializing chat store from sidebar...');
+      console.log(' Initializing chat store from sidebar...');
       initializeStore().catch(error => {
         console.error('Failed to initialize chat store:', error);
       });
     }
   }, [isInitialized, initializeStore]);
-
-  // Plugin icons mapping
   const pluginIcons = {
     todoList: CheckSquare,
     noteTaker: FileText,
@@ -341,7 +316,6 @@ const EnhancedSidebar: React.FC = () => {
     devDiagnostics: Zap,
     webBrowser: Globe
   };
-
   const availablePlugins = [
     {
       id: 'todoList',
@@ -393,23 +367,18 @@ const EnhancedSidebar: React.FC = () => {
       description: 'Browse the web and extract information from websites.'
     }
   ];
-
   const toggleSidebar = () => setShowSidebar(!showSidebar);
-
   const handleThemeToggle = () => {
     const newTheme = preferences.theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
   };
-
   const handleBrowserToggle = () => {
     setShowBrowser(!showBrowser);
   };
-
   const handleContentExtracted = (content: any) => {
     setExtractedContent(content);
-    console.log('📄 [Sidebar] Content extracted for LLM context:', content);
+    console.log(' [Sidebar] Content extracted for LLM context:', content);
   };
-
   const handleNewChat = async () => {
     try {
       await createNewChatWithTitle(`New Chat ${new Date().toLocaleString('en-US', {
@@ -422,13 +391,10 @@ const EnhancedSidebar: React.FC = () => {
       console.error('Failed to create new chat:', error);
     }
   };
-
   const handleToolClick = (toolId: string) => {
     setSelectedTool(toolId);
-    setShowPluginSidebar(false); // Close plugin sidebar when opening tool dashboard
+    setShowPluginSidebar(false);
   };
-
-  // Chat session handlers
   const handleSelectChat = async (chatId: string) => {
     try {
       await switchToChat(chatId);
@@ -437,7 +403,6 @@ const EnhancedSidebar: React.FC = () => {
       console.error('Failed to switch to chat:', error);
     }
   };
-
   const handleRenameChat = async (chatId: string, newTitle: string) => {
     try {
       await renameChat(chatId, newTitle);
@@ -446,7 +411,6 @@ const EnhancedSidebar: React.FC = () => {
       console.error('Failed to rename chat:', error);
     }
   };
-
   const handleDeleteChat = async (chatId: string) => {
     try {
       await deleteChat(chatId);
@@ -455,7 +419,6 @@ const EnhancedSidebar: React.FC = () => {
       console.error('Failed to delete chat:', error);
     }
   };
-
   const handleDuplicateChat = async (chatId: string) => {
     try {
       const session = chatSessions[chatId];
@@ -467,7 +430,6 @@ const EnhancedSidebar: React.FC = () => {
       console.error('Failed to duplicate chat:', error);
     }
   };
-
   const handleExportChat = async (chatId: string) => {
     try {
       const session = chatSessions[chatId];
@@ -488,7 +450,6 @@ const EnhancedSidebar: React.FC = () => {
       console.error('Failed to export chat:', error);
     }
   };
-
   const handleArchiveChat = async (chatId: string) => {
     try {
       await archiveChat(chatId);
@@ -497,55 +458,41 @@ const EnhancedSidebar: React.FC = () => {
       console.error('Failed to archive chat:', error);
     }
   };
-
   const handleToolExecute = async (data: any) => {
     console.log('Executing tool:', selectedTool, 'with data:', data);
-
     try {
-      // Store tool context for LLM integration
       const toolContext = {
         toolName: selectedTool,
         toolData: data.toolData,
         context: data.context,
         timestamp: new Date().toISOString()
       };
-
-      // Save to localStorage for LLM context integration
       const existingContext = JSON.parse(localStorage.getItem('toolContext') || '{}');
       existingContext[selectedTool || 'unknown'] = toolContext;
       localStorage.setItem('toolContext', JSON.stringify(existingContext));
-
       console.log('Tool context saved for LLM integration:', toolContext);
-
       return { success: true, message: 'Tool executed and context saved for LLM' };
     } catch (error) {
       console.error('Tool execution failed:', error);
       return { success: false, message: 'Tool execution failed' };
     }
   };
-
-  // Handle hybrid mode toggle
   const handleHybridModeToggle = () => {
     try {
       const newProvider = currentProvider === ModelProvider.LOCAL_GEMMA3N
         ? ModelProvider.HYBRID_AUTO
         : ModelProvider.LOCAL_GEMMA3N;
-
       llmRouter.setProvider(newProvider);
       setCurrentProvider(newProvider);
-
-      console.log('🔄 Switched model provider to:', newProvider);
+      console.log(' Switched model provider to:', newProvider);
     } catch (error) {
       console.error('Failed to toggle hybrid mode:', error);
     }
   };
-
-  // Filter chats based on search query with defensive checks
   const filteredChats = React.useMemo(() => {
     if (!isInitialized || !chatSummaries) {
       return [];
     }
-
     try {
       return searchQuery.trim()
         ? searchChats(searchQuery)
@@ -555,16 +502,12 @@ const EnhancedSidebar: React.FC = () => {
       return [];
     }
   }, [searchQuery, chatSummaries, isInitialized, searchChats, getRecentChats]);
-
-  // Debug logging
   useEffect(() => {
-    console.log('📊 Chat summaries count:', chatSummaries?.length || 0);
-    console.log('📊 Filtered chats count:', filteredChats.length);
-    console.log('📊 Is initialized:', isInitialized);
-    console.log('📊 Chat summaries:', chatSummaries);
+    console.log(' Chat summaries count:', chatSummaries?.length || 0);
+    console.log(' Filtered chats count:', filteredChats.length);
+    console.log(' Is initialized:', isInitialized);
+    console.log(' Chat summaries:', chatSummaries);
   }, [chatSummaries, filteredChats, isInitialized]);
-
-  // Show loading state if store is not initialized
   if (!isInitialized) {
     return (
       <>
@@ -575,7 +518,6 @@ const EnhancedSidebar: React.FC = () => {
         >
           {showSidebar ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
         </button>
-
         {showSidebar && (
           <div className="fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-900 shadow-lg flex items-center justify-center z-40">
             <div className="text-center">
@@ -587,7 +529,6 @@ const EnhancedSidebar: React.FC = () => {
       </>
     );
   }
-
   return (
     <>
       <button
@@ -597,16 +538,15 @@ const EnhancedSidebar: React.FC = () => {
       >
         {showSidebar ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
       </button>
-
       <div
         className={cn(
           'fixed top-0 left-0 h-full transition-transform transform z-40 flex',
           showSidebar ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        {/* Main Sidebar */}
+        {}
         <div className="w-80 h-full bg-white dark:bg-gray-900 shadow-lg flex flex-col border-r border-gray-200 dark:border-gray-700 overflow-hidden">
-          {/* Header - Fixed Height */}
+          {}
           <div className="flex-shrink-0 p-4 border-b border-gray-200 dark:border-gray-700 space-y-3">
             <button
               type="button"
@@ -617,8 +557,7 @@ const EnhancedSidebar: React.FC = () => {
               <Plus size={18} />
               New Chat
             </button>
-            
-            {/* Search */}
+            {}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
@@ -629,8 +568,7 @@ const EnhancedSidebar: React.FC = () => {
                 className="w-full pl-10 pr-4 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-
-            {/* Hybrid Mode Toggle */}
+            {}
             <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <div className="flex items-center gap-2">
                 <div className={cn(
@@ -659,8 +597,7 @@ const EnhancedSidebar: React.FC = () => {
                 />
               </button>
             </div>
-
-            {/* Tool Icons */}
+            {}
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                 Quick Tools
@@ -714,15 +651,13 @@ const EnhancedSidebar: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {/* Chat List - Exactly 25% of Available Space */}
+          {}
           <div className="flex flex-col border-b border-gray-200 dark:border-gray-700 chat-history-section">
-            {/* Chat List Header */}
+            {}
             <div className="flex-shrink-0 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Recent Chats</h3>
             </div>
-
-            {/* Scrollable Chat List */}
+            {}
             <div className="flex-1 overflow-y-auto overflow-x-hidden sidebar-scrollable">
               {filteredChats.length === 0 ? (
                 <div className="text-center py-8 px-4 text-gray-500 dark:text-gray-400">
@@ -753,30 +688,26 @@ const EnhancedSidebar: React.FC = () => {
               )}
             </div>
           </div>
-
-          {/* Remaining Content Area - 75% of Available Space */}
+          {}
           <div className="flex-1 flex flex-col min-h-0">
-            {/* Model Selector - Prominent Position */}
+            {}
             <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 p-3">
               <ModelSelector
                 onProviderChange={(provider) => {
-                  console.log('🤖 [Sidebar] Model provider changed:', provider);
+                  console.log(' [Sidebar] Model provider changed:', provider);
                 }}
               />
             </div>
-
-            {/* Capabilities Status Panel - Compact */}
+            {}
             <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 p-2">
               <CapabilitiesStatusPanel
                 isCollapsed={!showCapabilities}
                 onToggle={() => setShowCapabilities(!showCapabilities)}
               />
             </div>
-
-            {/* Spacer to push footer to bottom */}
+            {}
             <div className="flex-1"></div>
-
-            {/* Footer */}
+            {}
             <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"
@@ -786,7 +717,6 @@ const EnhancedSidebar: React.FC = () => {
               <span><Globe size={18} /></span>
               <span className="text-sm">{showBrowser ? 'Hide Browser' : 'Show Browser'}</span>
             </button>
-
             <button
               type="button"
               onClick={handleThemeToggle}
@@ -795,7 +725,6 @@ const EnhancedSidebar: React.FC = () => {
               <span>{preferences.theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}</span>
               <span className="text-sm">Toggle Dark Mode</span>
             </button>
-
             <div className="px-4 pb-4">
               <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                 <span>Privacy AI Assistant</span>
@@ -805,8 +734,7 @@ const EnhancedSidebar: React.FC = () => {
           </div>
           </div>
         </div>
-
-        {/* Plugin Sidebar */}
+        {}
         {settings.uiPreferences.showPluginSidebar && (
           <div className="w-16 bg-gray-100 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col items-center py-4 space-y-3">
             {availablePlugins.map((plugin) => {
@@ -826,9 +754,7 @@ const EnhancedSidebar: React.FC = () => {
                 </button>
               );
             })}
-            
             <div className="flex-1" />
-            
             <button
               type="button"
               onClick={() => updateUIPreferences({ showPluginSidebar: false })}
@@ -840,16 +766,14 @@ const EnhancedSidebar: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* Overlay for mobile */}
+      {}
       {showSidebar && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
           onClick={toggleSidebar}
         />
       )}
-
-      {/* Tool Dashboard Modals */}
+      {}
       {selectedTool && (
         <>
           {selectedTool === 'webBrowser' && (
@@ -888,8 +812,7 @@ const EnhancedSidebar: React.FC = () => {
           )}
         </>
       )}
-
-      {/* Embedded Browser */}
+      {}
       <EmbeddedBrowser
         isVisible={showBrowser}
         onToggle={handleBrowserToggle}
@@ -898,5 +821,4 @@ const EnhancedSidebar: React.FC = () => {
     </>
   );
 };
-
 export default EnhancedSidebar;

@@ -1,94 +1,68 @@
-#!/usr/bin/env python3
 """
-🔗 Tauri Integration Example for Vosk Real-time STT
+ Tauri Integration Example for Vosk Real-time STT
 Shows how to integrate the Vosk STT with your Tauri AI assistant.
 """
-
 import json
 import sys
 import threading
 import time
 from pathlib import Path
 from typing import Optional, Callable
-
 import numpy as np
 import sounddevice as sd
 import vosk
-
 class TauriVoskSTT:
     """Simplified Vosk STT for Tauri integration."""
-    
     def __init__(self, model_path: str, callback: Optional[Callable] = None):
         """
         Initialize Vosk STT for Tauri integration.
-        
         Args:
             model_path: Path to Vosk model directory
             callback: Function to call with transcription results
         """
         self.callback = callback
-        
-        # Vosk configuration
         self.sample_rate = 16000
         self.channels = 1
         self.blocksize = 2000
-        
-        # Initialize Vosk
         if not Path(model_path).exists():
             raise FileNotFoundError(f"Vosk model not found: {model_path}")
-        
-        vosk.SetLogLevel(-1)  # Reduce logging
+        vosk.SetLogLevel(-1)
         self.model = vosk.Model(model_path)
         self.recognizer = vosk.KaldiRecognizer(self.model, self.sample_rate)
-        
-        # State
         self.is_recording = False
         self.audio_buffer = []
-    
     def audio_callback(self, indata, frames, time, status):
         """Process audio input."""
         if not self.is_recording:
             return
-        
         if status:
             print(f"Audio status: {status}", file=sys.stderr)
-        
-        # Convert to int16 mono
         audio_data = indata[:, 0] if indata.shape[1] > 1 else indata.flatten()
         audio_int16 = (audio_data * 32767).astype(np.int16)
-        
-        # Process with Vosk
         if self.recognizer.AcceptWaveform(audio_int16.tobytes()):
-            # Final result
             result = json.loads(self.recognizer.Result())
             if result.get('text', '').strip():
                 self._handle_result('final', result['text'])
         else:
-            # Partial result
             partial = json.loads(self.recognizer.PartialResult())
             if partial.get('partial', '').strip():
                 self._handle_result('partial', partial['partial'])
-    
     def _handle_result(self, result_type: str, text: str):
         """Handle transcription results."""
         if self.callback:
             self.callback(result_type, text)
         else:
-            # Default: print to stdout for Tauri to capture
             result = {
                 'type': result_type,
                 'text': text,
                 'timestamp': time.time()
             }
             print(json.dumps(result), flush=True)
-    
     def start_recording(self, duration: Optional[float] = None):
         """Start recording with optional duration limit."""
         if self.is_recording:
             return False
-        
         self.is_recording = True
-        
         try:
             with sd.InputStream(
                 channels=self.channels,
@@ -101,67 +75,46 @@ class TauriVoskSTT:
                     time.sleep(duration)
                     self.stop_recording()
                 else:
-                    # Record until stopped
                     while self.is_recording:
                         time.sleep(0.1)
-                        
         except Exception as e:
             self._handle_result('error', str(e))
             return False
-        
         return True
-    
     def stop_recording(self):
         """Stop recording and get final result."""
         if not self.is_recording:
             return
-        
         self.is_recording = False
-        
-        # Get final result
         final_result = json.loads(self.recognizer.FinalResult())
         if final_result.get('text', '').strip():
             self._handle_result('final', final_result['text'])
-    
     def transcribe_duration(self, duration: float = 5.0) -> str:
         """Record for a specific duration and return transcript."""
         transcript = ""
-        
         def capture_result(result_type, text):
             nonlocal transcript
             if result_type == 'final':
                 transcript = text
-        
-        # Temporarily set callback
         original_callback = self.callback
         self.callback = capture_result
-        
         try:
             self.start_recording(duration)
             return transcript
         finally:
             self.callback = original_callback
-
-
 def main():
     """Main function for command-line usage."""
     if len(sys.argv) < 2:
         print("Usage: python tauri_vosk_integration.py <model_path> [duration]")
         print("Example: python tauri_vosk_integration.py vosk-model-en-us-0.22 5.0")
         sys.exit(1)
-    
     model_path = sys.argv[1] if len(sys.argv) > 1 else "vosk-model-small-en-us-0.15"
     duration = float(sys.argv[2]) if len(sys.argv) > 2 else 5.0
-
     try:
-        # Initialize STT
         stt = TauriVoskSTT(model_path)
-
-        # Record for specified duration
         print(f"Recording for {duration} seconds...", file=sys.stderr)
         transcript = stt.transcribe_duration(duration)
-
-        # Output final result for Tauri
         if transcript:
             result = {
                 'success': True,
@@ -174,9 +127,7 @@ def main():
                 'error': 'No speech detected',
                 'duration': duration
             }
-
         print(json.dumps(result))
-        
     except Exception as e:
         error_result = {
             'success': False,
@@ -185,13 +136,8 @@ def main():
         }
         print(json.dumps(error_result))
         sys.exit(1)
-
-
-# Example integration functions for your Tauri backend
 def example_tauri_integration():
     """Example of how to integrate with Tauri Rust backend."""
-    
-    # This would be called from your Rust code via subprocess
     def rust_stt_command(model_path: str, duration: float = 5.0) -> dict:
         """
         Function that your Rust backend would call.
@@ -200,11 +146,10 @@ def example_tauri_integration():
         try:
             stt = TauriVoskSTT(model_path)
             transcript = stt.transcribe_duration(duration)
-            
             return {
                 'success': True,
                 'transcript': transcript,
-                'confidence': 1.0,  # Vosk doesn't provide confidence scores
+                'confidence': 1.0,
                 'duration': duration
             }
         except Exception as e:
@@ -214,14 +159,10 @@ def example_tauri_integration():
                 'transcript': '',
                 'duration': 0
             }
-    
-    # Example Rust integration (pseudo-code):
     """
     // In your Rust code (src-tauri/src/stt_tts.rs):
-    
     use std::process::Command;
     use serde_json::Value;
-    
     #[tauri::command]
     pub async fn vosk_transcribe(duration: f64) -> Result<String, String> {
         let output = Command::new("python")
@@ -230,11 +171,9 @@ def example_tauri_integration():
             .arg(duration.to_string())
             .output()
             .map_err(|e| format!("Failed to run STT: {}", e))?;
-        
         if output.status.success() {
             let result: Value = serde_json::from_slice(&output.stdout)
                 .map_err(|e| format!("Failed to parse STT result: {}", e))?;
-            
             if result["success"].as_bool().unwrap_or(false) {
                 Ok(result["transcript"].as_str().unwrap_or("").to_string())
             } else {
@@ -245,7 +184,5 @@ def example_tauri_integration():
         }
     }
     """
-
-
 if __name__ == "__main__":
     main()

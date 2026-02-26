@@ -12,24 +12,20 @@ import { cn } from '../utils/cn';
 import { Plugin } from '../types';
 import { pluginRegistry } from '../core/plugins/registry';
 import { useAppStore } from '../stores/chatStore';
-
 interface PluginPanelProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
 interface PluginItemProps {
   plugin: Plugin;
   isEnabled: boolean;
   onToggle: (pluginName: string, enabled: boolean) => void;
 }
-
 const PluginItem: React.FC<PluginItemProps> = ({ plugin, isEnabled, onToggle }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-
   return (
     <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-3">
-      {/* Plugin Header */}
+      {}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -42,15 +38,13 @@ const PluginItem: React.FC<PluginItemProps> = ({ plugin, isEnabled, onToggle }) 
             </p>
           </div>
         </div>
-        
         <div className="flex items-center space-x-2">
-          {/* Status Indicator */}
+          {}
           <div className={cn(
             "w-2 h-2 rounded-full",
             isEnabled ? "bg-green-500" : "bg-gray-400"
           )} />
-          
-          {/* Toggle Switch */}
+          {}
           <button
             type="button"
             onClick={() => onToggle(plugin.manifest.name, !isEnabled)}
@@ -68,13 +62,11 @@ const PluginItem: React.FC<PluginItemProps> = ({ plugin, isEnabled, onToggle }) 
           </button>
         </div>
       </div>
-
-      {/* Plugin Description */}
+      {}
       <p className="text-sm text-gray-600 dark:text-gray-300">
         {plugin.manifest.description}
       </p>
-
-      {/* Trigger Keywords */}
+      {}
       <div className="flex flex-wrap gap-1">
         {plugin.manifest.triggerWords.slice(0, 3).map((keyword, index) => (
           <span
@@ -91,8 +83,7 @@ const PluginItem: React.FC<PluginItemProps> = ({ plugin, isEnabled, onToggle }) 
           </span>
         )}
       </div>
-
-      {/* Expandable Details */}
+      {}
       <div>
         <button
           type="button"
@@ -106,19 +97,16 @@ const PluginItem: React.FC<PluginItemProps> = ({ plugin, isEnabled, onToggle }) 
           )}
           <span>Details</span>
         </button>
-
         {isExpanded && (
           <div className="mt-3 space-y-2 text-sm">
             <div>
               <span className="font-medium text-gray-700 dark:text-gray-300">Category:</span>
               <span className="ml-2 text-gray-600 dark:text-gray-400">{plugin.manifest.category}</span>
             </div>
-            
             <div>
               <span className="font-medium text-gray-700 dark:text-gray-300">Author:</span>
               <span className="ml-2 text-gray-600 dark:text-gray-400">{plugin.manifest.author}</span>
             </div>
-
             <div>
               <span className="font-medium text-gray-700 dark:text-gray-300">All Keywords:</span>
               <div className="mt-1 flex flex-wrap gap-1">
@@ -132,7 +120,6 @@ const PluginItem: React.FC<PluginItemProps> = ({ plugin, isEnabled, onToggle }) 
                 ))}
               </div>
             </div>
-
             {plugin.manifest.examples && plugin.manifest.examples.length > 0 && (
               <div>
                 <span className="font-medium text-gray-700 dark:text-gray-300">Examples:</span>
@@ -151,23 +138,17 @@ const PluginItem: React.FC<PluginItemProps> = ({ plugin, isEnabled, onToggle }) 
     </div>
   );
 };
-
 const PluginPanel: React.FC<PluginPanelProps> = ({ isOpen, onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [plugins, setPlugins] = useState<Plugin[]>([]);
   const [filteredPlugins, setFilteredPlugins] = useState<Plugin[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  
   const { pluginsEnabled, setPluginsEnabled } = useAppStore();
   const [enabledPlugins, setEnabledPlugins] = useState<Set<string>>(new Set());
-
-  // Load plugins on mount
   useEffect(() => {
     const loadedPlugins = pluginRegistry.getAll();
     setPlugins(loadedPlugins);
     setFilteredPlugins(loadedPlugins);
-    
-    // Initialize enabled plugins from localStorage or default to all enabled
     const savedEnabledPlugins = localStorage.getItem('enabledPlugins');
     if (savedEnabledPlugins) {
       setEnabledPlugins(new Set(JSON.parse(savedEnabledPlugins)));
@@ -175,12 +156,8 @@ const PluginPanel: React.FC<PluginPanelProps> = ({ isOpen, onClose }) => {
       setEnabledPlugins(new Set(loadedPlugins.map(p => p.manifest.name)));
     }
   }, []);
-
-  // Filter plugins based on search and category
   useEffect(() => {
     let filtered = plugins;
-
-    // Filter by search term
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(plugin =>
@@ -190,18 +167,12 @@ const PluginPanel: React.FC<PluginPanelProps> = ({ isOpen, onClose }) => {
         plugin.manifest.category.toLowerCase().includes(term)
       );
     }
-
-    // Filter by category
     if (selectedCategory !== 'all') {
       filtered = filtered.filter(plugin => plugin.manifest.category === selectedCategory);
     }
-
     setFilteredPlugins(filtered);
   }, [plugins, searchTerm, selectedCategory]);
-
-  // Get unique categories
   const categories = ['all', ...Array.from(new Set(plugins.map(p => p.manifest.category)))];
-
   const handlePluginToggle = (pluginName: string, enabled: boolean) => {
     const newEnabledPlugins = new Set(enabledPlugins);
     if (enabled) {
@@ -209,24 +180,20 @@ const PluginPanel: React.FC<PluginPanelProps> = ({ isOpen, onClose }) => {
     } else {
       newEnabledPlugins.delete(pluginName);
     }
-    
     setEnabledPlugins(newEnabledPlugins);
     localStorage.setItem('enabledPlugins', JSON.stringify(Array.from(newEnabledPlugins)));
   };
-
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 z-50 flex">
-      {/* Backdrop */}
+      {}
       <div 
         className="fixed inset-0 bg-black bg-opacity-50" 
         onClick={onClose}
       />
-      
-      {/* Panel */}
+      {}
       <div className="relative ml-auto w-96 h-full bg-white dark:bg-gray-900 shadow-xl flex flex-col">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-2">
             <Settings className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -242,10 +209,9 @@ const PluginPanel: React.FC<PluginPanelProps> = ({ isOpen, onClose }) => {
             <X className="w-5 h-5" />
           </button>
         </div>
-
-        {/* Controls */}
+        {}
         <div className="p-4 space-y-3 border-b border-gray-200 dark:border-gray-700">
-          {/* Global Plugin Toggle */}
+          {}
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Enable Plugins
@@ -266,8 +232,7 @@ const PluginPanel: React.FC<PluginPanelProps> = ({ isOpen, onClose }) => {
               />
             </button>
           </div>
-
-          {/* Search */}
+          {}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -278,8 +243,7 @@ const PluginPanel: React.FC<PluginPanelProps> = ({ isOpen, onClose }) => {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-
-          {/* Category Filter */}
+          {}
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -292,8 +256,7 @@ const PluginPanel: React.FC<PluginPanelProps> = ({ isOpen, onClose }) => {
             ))}
           </select>
         </div>
-
-        {/* Plugin List */}
+        {}
         <div className="flex-1 overflow-y-auto p-4">
           {filteredPlugins.length === 0 ? (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -315,8 +278,7 @@ const PluginPanel: React.FC<PluginPanelProps> = ({ isOpen, onClose }) => {
             </div>
           )}
         </div>
-
-        {/* Footer */}
+        {}
         <div className="p-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
             <span>{filteredPlugins.length} of {plugins.length} plugins</span>
@@ -327,5 +289,4 @@ const PluginPanel: React.FC<PluginPanelProps> = ({ isOpen, onClose }) => {
     </div>
   );
 };
-
 export default PluginPanel;

@@ -1,32 +1,23 @@
 import React from 'react';
 import { AlertTriangle, Monitor, Terminal, ExternalLink } from 'lucide-react';
 import { getTauriStatus } from '../utils/tauriDetection';
-
 interface BrowserModeBlockerProps {
   onIgnoreWarning?: () => void;
 }
-
 export const BrowserModeBlocker: React.FC<BrowserModeBlockerProps> = ({
   onIgnoreWarning
 }) => {
   const tauriStatus = getTauriStatus();
-
-  // Don't show blocker if Tauri is connected OR if we're in development mode
   if (tauriStatus.status === 'connected' || tauriStatus.status === 'checking') {
     return null;
   }
-
-  // Check if we're in development mode (localhost)
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
   const isDevPort = window.location.port === '5174' || window.location.port === '5173';
-
-  // In development mode, automatically bypass the blocker
   if (isLocalhost && isDevPort && onIgnoreWarning) {
-    console.log('🔧 Development mode detected, bypassing browser mode blocker');
-    setTimeout(() => onIgnoreWarning(), 100); // Small delay to prevent immediate execution
+    console.log(' Development mode detected, bypassing browser mode blocker');
+    setTimeout(() => onIgnoreWarning(), 100);
     return null;
   }
-
   return (
     <div className="fixed inset-0 z-50 bg-gray-900 bg-opacity-95 flex items-center justify-center">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-2xl w-full mx-4 p-8">
@@ -39,20 +30,17 @@ export const BrowserModeBlocker: React.FC<BrowserModeBlockerProps> = ({
               </div>
             </div>
           </div>
-          
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             Desktop Mode Required
           </h1>
-          
           <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 mb-6">
             <p className="text-red-800 dark:text-red-200 font-medium">
               {tauriStatus.message}
             </p>
           </div>
-          
           <div className="text-left mb-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-              🛠️ How to Fix:
+              ️ How to Fix:
             </h3>
             <div className="space-y-3">
               {(tauriStatus.recommendations || []).map((rec, index) => (
@@ -65,7 +53,6 @@ export const BrowserModeBlocker: React.FC<BrowserModeBlockerProps> = ({
               ))}
             </div>
           </div>
-          
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
             <div className="flex items-center justify-center space-x-2 mb-3">
               <Terminal className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -81,7 +68,6 @@ export const BrowserModeBlocker: React.FC<BrowserModeBlockerProps> = ({
               This launches the full Tauri desktop app with all features
             </div>
           </div>
-          
           <div className="text-sm text-gray-600 dark:text-gray-400 mb-6">
             <div className="flex items-center justify-center space-x-2 mb-2">
               <Monitor className="w-4 h-4" />
@@ -95,7 +81,6 @@ export const BrowserModeBlocker: React.FC<BrowserModeBlockerProps> = ({
               <li>Offline model execution</li>
             </ul>
           </div>
-          
           <div className="flex gap-3 justify-center">
             <button
               type="button"
@@ -105,7 +90,6 @@ export const BrowserModeBlocker: React.FC<BrowserModeBlockerProps> = ({
               <ExternalLink className="w-4 h-4" />
               <span>Refresh Page</span>
             </button>
-
             {onIgnoreWarning && (
               <button
                 type="button"
@@ -116,7 +100,6 @@ export const BrowserModeBlocker: React.FC<BrowserModeBlockerProps> = ({
               </button>
             )}
           </div>
-          
           <div className="mt-6 text-xs text-gray-500 dark:text-gray-400">
             <p>
               If you're seeing this in the desktop app, please restart the application.
@@ -127,5 +110,4 @@ export const BrowserModeBlocker: React.FC<BrowserModeBlockerProps> = ({
     </div>
   );
 };
-
 export default BrowserModeBlocker;

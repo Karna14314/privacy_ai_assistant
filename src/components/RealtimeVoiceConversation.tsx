@@ -6,12 +6,10 @@ import { useStreamingTTS } from '../hooks/useStreamingTTS';
 import { usePythonBackendStreaming } from '../hooks/usePythonBackendStreaming';
 import { usePythonBackendLLM } from '../hooks/usePythonBackendLLM';
 import { useSettingsStore } from '../stores/settingsStore';
-
 interface RealtimeVoiceConversationProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
 interface ConversationMessage {
   id: string;
   role: 'user' | 'assistant';
@@ -19,7 +17,6 @@ interface ConversationMessage {
   timestamp: Date;
   isStreaming?: boolean;
 }
-
 const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ isOpen, onClose }) => {
   const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([]);
   const [isVoiceOutputEnabled, setIsVoiceOutputEnabled] = useState(true);
@@ -34,12 +31,9 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'listening' | 'processing' | 'speaking' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
-
   const { settings } = useSettingsStore();
   const conversationRef = useRef<HTMLDivElement>(null);
   const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Hooks
   const {
     isRecording,
     isConnected: sttConnected,
@@ -52,27 +46,22 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
     stopRecording,
     clearResults
   } = useRealtimeSTT();
-
   const {
     ttsState,
     addToQueue,
     stop: stopTTS,
     clearQueue: clearTTSQueue
   } = useStreamingTTS();
-
   const {
     streamingState,
     startStream,
     stopStream
   } = usePythonBackendStreaming();
-
   const {
     backendHealth,
     checkBackendHealth,
     startBackend
   } = usePythonBackendLLM();
-
-  // Recording timer
   useEffect(() => {
     if (isRecording) {
       recordingTimerRef.current = setInterval(() => {
@@ -85,62 +74,46 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
       }
       setRecordingTime(0);
     }
-
     return () => {
       if (recordingTimerRef.current) {
         clearInterval(recordingTimerRef.current);
       }
     };
   }, [isRecording]);
-
-  // Auto-scroll conversation
   useEffect(() => {
     if (conversationRef.current) {
       conversationRef.current.scrollTop = conversationRef.current.scrollHeight;
     }
   }, [conversationHistory]);
-
-  // Handle final transcription and trigger LLM
   useEffect(() => {
     if (finalText && finalText.trim().length > 0 && !isRecording && isVoiceInputEnabled) {
-      console.log('🎤 Final transcription received, processing with LLM:', finalText);
+      console.log(' Final transcription received, processing with LLM:', finalText);
       handleUserInput(finalText.trim());
       clearResults();
     }
   }, [finalText, isRecording, isVoiceInputEnabled]);
-
-  // Handle streaming LLM response for TTS
   useEffect(() => {
     if (streamingState.streamedContent && isVoiceOutputEnabled) {
-      // Add new content to TTS queue as it streams in
       const newContent = streamingState.streamedContent;
       if (newContent.length > 0) {
-        // Extract new words since last update
         const words = newContent.split(' ');
-        if (words.length >= 3) { // Wait for at least 3 words before speaking
+        if (words.length >= 3) {
           const lastFewWords = words.slice(-3).join(' ');
           addToQueue(lastFewWords);
         }
       }
     }
   }, [streamingState.streamedContent, isVoiceOutputEnabled, addToQueue]);
-
-  // Check backend health on modal open
   useEffect(() => {
     if (isOpen) {
       checkBackendHealth();
     }
   }, [isOpen, checkBackendHealth]);
-
-  // Handle user input (from voice transcription)
   const handleUserInput = useCallback(async (text: string) => {
     if (!text.trim()) return;
-
     setIsLoading(true);
     setStatus('processing');
     setStatusMessage('Processing your request...');
-
-    // Add user message to conversation
     const userMessage: ConversationMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
@@ -148,20 +121,14 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
       timestamp: new Date()
     };
     setConversationHistory(prev => [...prev, userMessage]);
-
-    // Stop any current TTS
     stopTTS();
     clearTTSQueue();
-
     try {
-      // Ensure backend is running
       if (!backendHealth) {
-        console.log('🚀 Starting Python backend...');
+        console.log(' Starting Python backend...');
         await startBackend();
         await checkBackendHealth();
       }
-
-      // Create assistant message placeholder
       const assistantMessage: ConversationMessage = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
@@ -170,16 +137,11 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
         isStreaming: true
       };
       setConversationHistory(prev => [...prev, assistantMessage]);
-
-      // Start streaming LLM response
       await startStream(
         text,
         'llama3.1:8b',
-        // onChunk callback - update conversation and TTS
         (chunk: string) => {
-          console.log('📝 Streaming chunk received for conversation:', chunk.length, 'chars');
-          
-          // Update conversation history
+          console.log(' Streaming chunk received for conversation:', chunk.length, 'chars');
           setConversationHistory(prev => 
             prev.map(msg => 
               msg.id === assistantMessage.id 
@@ -187,8 +149,6 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
                 : msg
             )
           );
-
-          // Add to TTS queue if voice output is enabled
           if (isVoiceOutputEnabled && chunk.length > assistantMessage.content.length + 10) {
             const newContent = chunk.substring(assistantMessage.content.length);
             if (newContent.trim()) {
@@ -196,7 +156,6 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
             }
           }
         },
-        // onComplete callback
         () => {
           console.log('✅ Streaming completed for conversation');
           setConversationHistory(prev => 
@@ -209,7 +168,6 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
           setStatus('speaking');
           setStatusMessage('Speaking response...');
         },
-        // onError callback
         (error: string) => {
           console.error('❌ Streaming error in conversation:', error);
           setConversationHistory(prev => 
@@ -223,7 +181,6 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
           setStatusMessage(`Error: ${error}`);
         }
       );
-
     } catch (error) {
       console.error('❌ Error processing user input:', error);
       const errorMessage: ConversationMessage = {
@@ -245,16 +202,12 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
       }, 2000);
     }
   }, [backendHealth, startBackend, checkBackendHealth, startStream, isVoiceOutputEnabled, stopTTS, clearTTSQueue, addToQueue, status]);
-
-  // Handle voice recording controls
   const handleStartRecording = async () => {
     if (!isVoiceInputEnabled) return;
-
     try {
       if (!micPermission) {
         await requestMicPermission();
       }
-
       if (micPermission) {
         await startRecording();
         setStatus('listening');
@@ -266,7 +219,6 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
       setStatusMessage('Failed to start recording');
     }
   };
-
   const handleStopRecording = async () => {
     try {
       await stopRecording();
@@ -278,7 +230,6 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
       setStatusMessage('Failed to stop recording');
     }
   };
-
   const handleToggleVoiceOutput = () => {
     setIsVoiceOutputEnabled(!isVoiceOutputEnabled);
     if (isVoiceOutputEnabled) {
@@ -286,14 +237,12 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
       clearTTSQueue();
     }
   };
-
   const handleToggleVoiceInput = () => {
     setIsVoiceInputEnabled(!isVoiceInputEnabled);
     if (isRecording) {
       stopRecording();
     }
   };
-
   const handleClearConversation = () => {
     setConversationHistory([]);
     stopTTS();
@@ -302,7 +251,6 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
     setStatus('idle');
     setStatusMessage('Conversation cleared');
   };
-
   const handleClose = () => {
     if (isRecording) {
       stopRecording();
@@ -315,13 +263,11 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
     clearResults();
     onClose();
   };
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-
   const getStatusColor = () => {
     switch (status) {
       case 'listening': return 'text-blue-600 bg-blue-50 dark:bg-blue-900/20';
@@ -331,7 +277,6 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
       default: return 'text-gray-600 bg-gray-50 dark:bg-gray-900/20';
     }
   };
-
   const getStatusIcon = () => {
     switch (status) {
       case 'listening': return <Mic className="w-4 h-4 animate-pulse" />;
@@ -341,13 +286,11 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
       default: return <CheckCircle className="w-4 h-4" />;
     }
   };
-
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-4xl h-[90vh] flex flex-col">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
             <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
@@ -369,8 +312,7 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
             <X size={20} />
           </button>
         </div>
-
-        {/* Status Bar */}
+        {}
         <div className={cn(
           "px-6 py-3 flex items-center justify-between transition-all duration-300",
           getStatusColor()
@@ -392,10 +334,9 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
             </div>
           </div>
         </div>
-
-        {/* Conversation Area */}
+        {}
         <div className="flex-1 flex flex-col">
-          {/* Conversation History */}
+          {}
           <div 
             ref={conversationRef}
             className="flex-1 overflow-y-auto p-4 space-y-4"
@@ -443,8 +384,7 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
                 </div>
               ))
             )}
-
-            {/* Partial transcription display */}
+            {}
             {partialText && (
               <div className="flex items-start space-x-3 justify-end">
                 <div className="max-w-xs lg:max-w-md px-4 py-2 rounded-lg bg-blue-600 text-white opacity-75">
@@ -461,11 +401,10 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
               </div>
             )}
           </div>
-
-          {/* Controls */}
+          {}
           <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
             <div className="flex items-center justify-between">
-              {/* Voice Controls */}
+              {}
               <div className="flex items-center space-x-4">
                 <button
                   onClick={isRecording ? handleStopRecording : handleStartRecording}
@@ -479,7 +418,6 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
                 >
                   {isRecording ? <MicOff size={24} /> : <Mic size={24} />}
                 </button>
-
                 <button
                   onClick={handleToggleVoiceOutput}
                   className={cn(
@@ -491,7 +429,6 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
                 >
                   {isVoiceOutputEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
                 </button>
-
                 <button
                   onClick={handleToggleVoiceInput}
                   className={cn(
@@ -504,8 +441,7 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
                   {isVoiceInputEnabled ? <Mic size={20} /> : <MicOff size={20} />}
                 </button>
               </div>
-
-              {/* Additional Controls */}
+              {}
               <div className="flex items-center space-x-2">
                 <button
                   onClick={handleClearConversation}
@@ -526,8 +462,7 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
                 </button>
               </div>
             </div>
-
-            {/* Recording Timer */}
+            {}
             {isRecording && (
               <div className="mt-3 text-center">
                 <div className="text-lg font-mono text-blue-600">
@@ -544,5 +479,4 @@ const RealtimeVoiceConversation: React.FC<RealtimeVoiceConversationProps> = ({ i
     </div>
   );
 };
-
-export default RealtimeVoiceConversation; 
+export default RealtimeVoiceConversation;

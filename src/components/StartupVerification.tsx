@@ -3,11 +3,9 @@ import { AlertTriangle, CheckCircle, Loader2, RefreshCw } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { modelHealthChecker } from '../utils/modelHealth';
 import { invoke } from '@tauri-apps/api/core';
-
 interface StartupVerificationProps {
   onVerificationComplete: (success: boolean) => void;
 }
-
 interface VerificationStep {
   id: string;
   name: string;
@@ -16,7 +14,6 @@ interface VerificationStep {
   error?: string;
   recommendations?: string[];
 }
-
 export const StartupVerification: React.FC<StartupVerificationProps> = ({
   onVerificationComplete
 }) => {
@@ -46,18 +43,14 @@ export const StartupVerification: React.FC<StartupVerificationProps> = ({
       status: 'pending'
     }
   ]);
-
   const [isVerifying, setIsVerifying] = useState(false);
-
   const updateStep = (id: string, updates: Partial<VerificationStep>) => {
     setSteps(prev => prev.map(step => 
       step.id === id ? { ...step, ...updates } : step
     ));
   };
-
   const verifyTauriEnvironment = async (): Promise<boolean> => {
     updateStep('tauri', { status: 'checking' });
-    
     try {
       if (typeof window === 'undefined' || !window.__TAURI__) {
         updateStep('tauri', { 
@@ -67,7 +60,6 @@ export const StartupVerification: React.FC<StartupVerificationProps> = ({
         });
         return false;
       }
-      
       updateStep('tauri', { status: 'success' });
       return true;
     } catch (error) {
@@ -79,13 +71,10 @@ export const StartupVerification: React.FC<StartupVerificationProps> = ({
       return false;
     }
   };
-
   const verifyLLMService = async (): Promise<boolean> => {
     updateStep('ollama', { status: 'checking' });
-    
     try {
       const isHealthy = await modelHealthChecker.checkHealth();
-      
       if (isHealthy) {
         updateStep('ollama', { status: 'success' });
         return true;
@@ -114,16 +103,12 @@ export const StartupVerification: React.FC<StartupVerificationProps> = ({
       return false;
     }
   };
-
   const verifyGemmaModel = async (): Promise<boolean> => {
     updateStep('gemma', { status: 'checking' });
-    
     try {
-      // Try to make a simple test request to verify the model
       const response = await invoke<string>('generate_llm_response', { 
         prompt: 'Hello' 
       });
-      
       if (response && response.trim().length > 0) {
         updateStep('gemma', { status: 'success' });
         return true;
@@ -153,13 +138,10 @@ export const StartupVerification: React.FC<StartupVerificationProps> = ({
       return false;
     }
   };
-
   const verifyAudioSystem = async (): Promise<boolean> => {
     updateStep('audio', { status: 'checking' });
-    
     try {
       const result = await invoke<string>('test_audio_devices');
-      
       if (result && result.includes('success')) {
         updateStep('audio', { status: 'success' });
         return true;
@@ -173,7 +155,7 @@ export const StartupVerification: React.FC<StartupVerificationProps> = ({
             'Voice features will be limited'
           ]
         });
-        return false; // Audio is not critical, so we don't fail completely
+        return false;
       }
     } catch (error) {
       updateStep('audio', { 
@@ -185,34 +167,25 @@ export const StartupVerification: React.FC<StartupVerificationProps> = ({
           'Voice input will be unavailable'
         ]
       });
-      return false; // Audio is not critical
+      return false;
     }
   };
-
   const runVerification = async () => {
     setIsVerifying(true);
-    
     const tauriOk = await verifyTauriEnvironment();
     const ollamaOk = await verifyLLMService();
     const gemmaOk = await verifyGemmaModel();
-    await verifyAudioSystem(); // Audio is not critical for core functionality
-
-    // Core functionality requires Tauri, Ollama, and Gemma
+    await verifyAudioSystem();
     const coreSuccess = tauriOk && ollamaOk && gemmaOk;
-
     setIsVerifying(false);
     onVerificationComplete(coreSuccess);
   };
-
   useEffect(() => {
-    // Auto-start verification after a short delay
     const timer = setTimeout(() => {
       runVerification();
     }, 500);
-    
     return () => clearTimeout(timer);
   }, []);
-
   const getStepIcon = (step: VerificationStep) => {
     switch (step.status) {
       case 'checking':
@@ -225,12 +198,10 @@ export const StartupVerification: React.FC<StartupVerificationProps> = ({
         return <div className="w-4 h-4 rounded-full border-2 border-gray-300" />;
     }
   };
-
   const allStepsComplete = steps.every(step => step.status !== 'pending' && step.status !== 'checking');
   const criticalErrors = steps.filter(step =>
     step.status === 'error' && ['tauri', 'ollama', 'gemma'].includes(step.id)
   );
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
@@ -242,7 +213,6 @@ export const StartupVerification: React.FC<StartupVerificationProps> = ({
             Verifying system requirements and model availability...
           </p>
         </div>
-
         <div className="space-y-4">
           {steps.map((step) => (
             <div key={step.id} className="flex items-start space-x-3">
@@ -279,7 +249,6 @@ export const StartupVerification: React.FC<StartupVerificationProps> = ({
             </div>
           ))}
         </div>
-
         {allStepsComplete && (
           <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
             {criticalErrors.length === 0 ? (
@@ -312,5 +281,4 @@ export const StartupVerification: React.FC<StartupVerificationProps> = ({
     </div>
   );
 };
-
 export default StartupVerification;

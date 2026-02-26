@@ -15,14 +15,12 @@ import {
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { invoke } from '@tauri-apps/api/core';
-
 interface EmbeddedBrowserProps {
   className?: string;
   isVisible?: boolean;
   onToggle?: () => void;
   onContentExtracted?: (content: any) => void;
 }
-
 interface BrowserState {
   currentUrl: string;
   title: string;
@@ -32,14 +30,12 @@ interface BrowserState {
   isSecure: boolean;
   error: string | null;
 }
-
 interface SearchResult {
   title: string;
   snippet: string;
   url: string;
   source: string;
 }
-
 export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
   className,
   isVisible = false,
@@ -55,7 +51,6 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
     isSecure: false,
     error: null
   });
-  
   const [urlInput, setUrlInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -67,20 +62,13 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
   ]);
   const [width, setWidth] = useState(400);
   const [isResizing, setIsResizing] = useState(false);
-  
   const browserRef = useRef<HTMLDivElement>(null);
   const resizeRef = useRef<HTMLDivElement>(null);
-
-  // Handle URL navigation
   const handleNavigate = async (url: string) => {
     if (!url) return;
-
     setBrowserState(prev => ({ ...prev, isLoading: true, error: null }));
-
     try {
-      // Validate URL
       const validUrl = new URL(url);
-
       setBrowserState(prev => ({
         ...prev,
         currentUrl: url,
@@ -89,16 +77,12 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
         isLoading: false,
         canGoBack: true
       }));
-
       setUrlInput(url);
-
-      // Try to extract content for LLM integration (fallback if Tauri invoke fails)
       try {
         await extractPageContent(url);
       } catch (extractError) {
         console.warn('Content extraction failed, continuing with navigation:', extractError);
       }
-
     } catch (error) {
       console.error('Navigation failed:', error);
       setBrowserState(prev => ({
@@ -108,21 +92,13 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
       }));
     }
   };
-
-  // Handle web search
   const handleSearch = async (query: string) => {
     if (!query.trim()) return;
-
     setIsSearching(true);
     setSearchResults([]);
-
     try {
-      console.log('🔍 Searching for:', query);
-
-      // Fallback: Use DuckDuckGo search URL
+      console.log(' Searching for:', query);
       const searchUrl = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
-
-      // Create mock search results for demonstration
       const mockResults: SearchResult[] = [
         {
           title: `Search results for "${query}"`,
@@ -137,13 +113,9 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
           source: 'Wikipedia'
         }
       ];
-
       console.log('✅ Search results:', mockResults);
       setSearchResults(mockResults);
-
-      // Navigate to the search URL
       await handleNavigate(searchUrl);
-
     } catch (error) {
       console.error('Search failed:', error);
       setBrowserState(prev => ({
@@ -154,18 +126,13 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
       setIsSearching(false);
     }
   };
-
-  // Extract page content
   const extractPageContent = async (url: string) => {
     try {
-      console.log('📄 Extracting content from:', url);
-
-      // Try Tauri invoke first, fallback to basic extraction
+      console.log(' Extracting content from:', url);
       let content;
       try {
         content = await invoke('extract_page_content', { url });
       } catch (tauriError) {
-        // Fallback: Create basic content object
         content = {
           url,
           title: new URL(url).hostname,
@@ -173,87 +140,63 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
           timestamp: new Date().toISOString()
         };
       }
-
       console.log('✅ Content extracted:', content);
-
       if (onContentExtracted) {
         onContentExtracted(content);
       }
-
     } catch (error) {
       console.warn('Content extraction failed:', error);
     }
   };
-
-  // Handle form submissions
   const handleUrlSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     let url = urlInput.trim();
-    
     if (!url) return;
-    
-    // Add protocol if missing
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      // Check if it looks like a domain
       if (url.includes('.') && !url.includes(' ')) {
         url = `https://${url}`;
       } else {
-        // Treat as search query
         handleSearch(url);
         return;
       }
     }
-    
     handleNavigate(url);
   };
-
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleSearch(searchQuery);
   };
-
-  // Bookmark management
   const addBookmark = () => {
     if (browserState.currentUrl && !bookmarks.includes(browserState.currentUrl)) {
       setBookmarks(prev => [...prev, browserState.currentUrl]);
     }
   };
-
   const removeBookmark = (url: string) => {
     setBookmarks(prev => prev.filter(bookmark => bookmark !== url));
   };
-
-  // Resize handling
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsResizing(true);
     e.preventDefault();
   };
-
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isResizing) return;
-      
       const newWidth = Math.max(300, Math.min(800, e.clientX));
       setWidth(newWidth);
     };
-
     const handleMouseUp = () => {
       setIsResizing(false);
     };
-
     if (isResizing) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     }
-
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isResizing]);
-
   if (!isVisible) return null;
-
   return (
     <div 
       className={cn(
@@ -263,20 +206,18 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
       style={{ width: `${width}px` }}
       ref={browserRef}
     >
-      {/* Resize Handle */}
+      {}
       <div
         ref={resizeRef}
         className="absolute left-0 top-0 w-1 h-full cursor-col-resize bg-gray-300 dark:bg-gray-600 hover:bg-blue-500 transition-colors"
         onMouseDown={handleMouseDown}
       />
-
-      {/* Browser Header */}
+      {}
       <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2">
           <Globe size={18} className="text-blue-600" />
           <span className="font-medium text-sm">Browser</span>
         </div>
-        
         <button
           onClick={onToggle}
           className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
@@ -285,28 +226,25 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
           <X size={16} />
         </button>
       </div>
-
-      {/* Navigation Bar */}
+      {}
       <div className="p-3 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2 mb-3">
           <button
-            onClick={() => {/* Go back */}}
+            onClick={() => {}}
             disabled={!browserState.canGoBack}
             className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded disabled:opacity-50 disabled:cursor-not-allowed"
             title="Go back"
           >
             <ArrowLeft size={16} />
           </button>
-          
           <button
-            onClick={() => {/* Go forward */}}
+            onClick={() => {}}
             disabled={!browserState.canGoForward}
             className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded disabled:opacity-50 disabled:cursor-not-allowed"
             title="Go forward"
           >
             <ArrowRight size={16} />
           </button>
-          
           <button
             onClick={() => browserState.currentUrl && handleNavigate(browserState.currentUrl)}
             disabled={browserState.isLoading}
@@ -315,7 +253,6 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
           >
             <RefreshCw size={16} className={browserState.isLoading ? 'animate-spin' : ''} />
           </button>
-          
           <button
             onClick={() => handleNavigate('https://wikipedia.org')}
             className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
@@ -324,8 +261,7 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
             <Home size={16} />
           </button>
         </div>
-
-        {/* URL Bar */}
+        {}
         <form onSubmit={handleUrlSubmit} className="flex items-center gap-2 mb-3">
           <div className="flex-1 relative">
             <input
@@ -343,7 +279,6 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
               )}
             </div>
           </div>
-          
           <button
             type="button"
             onClick={addBookmark}
@@ -354,8 +289,7 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
             <Bookmark size={14} />
           </button>
         </form>
-
-        {/* Search Bar */}
+        {}
         <form onSubmit={handleSearchSubmit} className="flex items-center gap-2">
           <div className="flex-1 relative">
             <input
@@ -367,7 +301,6 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
             />
             <Search size={14} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
-          
           <button
             type="submit"
             disabled={isSearching}
@@ -377,10 +310,9 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
           </button>
         </form>
       </div>
-
-      {/* Content Area */}
+      {}
       <div className="flex-1 overflow-auto">
-        {/* Error Display */}
+        {}
         {browserState.error && (
           <div className="p-4 bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800">
             <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
@@ -389,8 +321,7 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
             </div>
           </div>
         )}
-
-        {/* Search Results */}
+        {}
         {searchResults.length > 0 && (
           <div className="p-4">
             <h3 className="font-medium text-sm mb-3">Search Results</h3>
@@ -423,8 +354,7 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
             </div>
           </div>
         )}
-
-        {/* Bookmarks */}
+        {}
         {bookmarks.length > 0 && (
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
             <h3 className="font-medium text-sm mb-3">Bookmarks</h3>
@@ -452,8 +382,7 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
             </div>
           </div>
         )}
-
-        {/* Web Content Iframe */}
+        {}
         {browserState.currentUrl && !browserState.error && (
           <div className="flex-1 border-t border-gray-200 dark:border-gray-700 browser-iframe-container">
             <iframe
@@ -476,8 +405,7 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
             />
           </div>
         )}
-
-        {/* Loading State */}
+        {}
         {browserState.isLoading && (
           <div className="flex-1 flex items-center justify-center border-t border-gray-200 dark:border-gray-700 browser-iframe-container">
             <div className="text-center">
@@ -486,8 +414,7 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
             </div>
           </div>
         )}
-
-        {/* Error State */}
+        {}
         {browserState.error && (
           <div className="flex-1 flex items-center justify-center border-t border-gray-200 dark:border-gray-700 browser-iframe-container">
             <div className="text-center">
@@ -503,8 +430,7 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
             </div>
           </div>
         )}
-
-        {/* Current Page Info */}
+        {}
         {browserState.currentUrl && (
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
             <div className="text-xs text-gray-600 dark:text-gray-400">
@@ -522,5 +448,4 @@ export const EmbeddedBrowser: React.FC<EmbeddedBrowserProps> = ({
     </div>
   );
 };
-
 export default EmbeddedBrowser;

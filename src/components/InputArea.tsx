@@ -5,17 +5,15 @@ import { useAppStore } from '../stores/chatStore';
 import { llmRouter } from '../core/agents/llmRouter';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import VoiceChat from './VoiceChat';
-
 interface InputAreaProps {
   onSendMessage: (message: string) => void;
-  onVoiceRecord?: () => void; // Made optional - voice functionality temporarily disabled
-  onRealtimeVoiceToggle?: () => void; // New prop for realtime voice conversation
-  onVoiceInput?: (text: string) => void; // New prop for voice-to-text input
+  onVoiceRecord?: () => void;
+  onRealtimeVoiceToggle?: () => void;
+  onVoiceInput?: (text: string) => void;
   disabled?: boolean;
   isLoading?: boolean;
   placeholder?: string;
 }
-
 const InputArea: React.FC<InputAreaProps> = ({
   onSendMessage,
   onVoiceRecord,
@@ -29,109 +27,76 @@ const InputArea: React.FC<InputAreaProps> = ({
   const [showVoiceChat, setShowVoiceChat] = useState(false);
   const [isVoiceInputActive, setIsVoiceInputActive] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  // Feature flags for voice functionality
   const { isVoiceEnabled } = useFeatureFlags();
-
-  // EXCLUSIVE: Only gemma3n:latest model - no model selection needed
   const currentModel = 'gemma3n:latest';
-
-  // Connection status state - safe for Tauri environment
   const [isOnline, setIsOnline] = useState(() => {
-    // Safe check for navigator.onLine in Tauri environment
     if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && 'onLine' in navigator) {
       return navigator.onLine;
     }
-    // Default to true if navigator.onLine is not available (Tauri environment)
     return true;
   });
-
-  // Handler functions
   const handleSendMessage = () => {
     if (currentInput.trim() && !disabled && !isLoading) {
       onSendMessage(currentInput.trim());
       setCurrentInput('');
-
-      // Enhanced focus and scroll handling after message send
       if (textareaRef.current) {
         textareaRef.current.focus();
         textareaRef.current.style.height = 'auto';
       }
     }
   };
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
-
-  // Voice chat handlers
   const handleVoiceToggle = () => {
     setShowVoiceChat(!showVoiceChat);
   };
-
   const handleTranscriptUpdate = (transcript: string, isUser: boolean) => {
     if (isUser) {
-      // User speech - add to input or send directly
       setCurrentInput(transcript);
       onSendMessage(transcript);
     } else {
-      // AI response - this will be handled by the main chat interface
-      console.log('🤖 [Voice] AI response:', transcript);
+      console.log(' [Voice] AI response:', transcript);
     }
   };
-
   const handleVoiceInputToggle = () => {
     if (isVoiceInputActive) {
-      // Stop voice input
       setIsVoiceInputActive(false);
     } else {
-      // Start voice input
       setIsVoiceInputActive(true);
-
-      // Use Web Speech API for voice input
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
         const recognition = new SpeechRecognition();
-
         recognition.continuous = false;
         recognition.interimResults = false;
         recognition.lang = 'en-US';
-
         recognition.onstart = () => {
-          console.log('🎤 Voice input started');
+          console.log(' Voice input started');
           setIsVoiceInputActive(true);
         };
-
         recognition.onresult = (event: any) => {
           const transcript = event.results[0][0].transcript;
-          console.log('🎤 Voice input result:', transcript);
+          console.log(' Voice input result:', transcript);
           setCurrentInput(transcript);
-
-          // If onVoiceInput callback is provided, call it
           if (onVoiceInput) {
             onVoiceInput(transcript);
           }
-
-          // Auto-send the message
           setTimeout(() => {
             onSendMessage(transcript);
             setCurrentInput('');
           }, 500);
         };
-
         recognition.onerror = (event: any) => {
-          console.error('🎤 Voice input error:', event.error);
+          console.error(' Voice input error:', event.error);
           setIsVoiceInputActive(false);
         };
-
         recognition.onend = () => {
-          console.log('🎤 Voice input ended');
+          console.log(' Voice input ended');
           setIsVoiceInputActive(false);
         };
-
         recognition.start();
       } else {
         console.error('Speech recognition not supported');
@@ -140,66 +105,54 @@ const InputArea: React.FC<InputAreaProps> = ({
       }
     }
   };
-
-  // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   }, [currentInput]);
-
-  // Monitor connection status safely for Tauri environment
   useEffect(() => {
     const updateConnectionStatus = () => {
       if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && 'onLine' in navigator) {
         setIsOnline(navigator.onLine);
       }
     };
-
-    // Only add event listeners if they're available
     if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && 'onLine' in navigator) {
       window.addEventListener('online', updateConnectionStatus);
       window.addEventListener('offline', updateConnectionStatus);
-
       return () => {
         window.removeEventListener('online', updateConnectionStatus);
         window.removeEventListener('offline', updateConnectionStatus);
       };
     }
   }, []);
-
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = () => {
-      // No dropdowns to close
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
   return (
     <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 pb-8">
-      {/* Model & Mode Selection Controls */}
+      {}
       <div className="flex items-center justify-between mb-3 px-1">
         <div className="flex items-center space-x-4">
-          {/* Mode Toggle */}
+          {}
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-600 dark:text-gray-400">Mode:</span>
             <button
-              onClick={() => {}} // No mode toggle
+              onClick={() => {}}
               className={cn(
                 "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-                "bg-gray-300 dark:bg-gray-600" // Always gray
+                "bg-gray-300 dark:bg-gray-600"
               )}
             >
               <span
                 className={cn(
                   "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
-                  "translate-x-1" // Always at the left
+                  "translate-x-1"
                 )}
               />
             </button>
@@ -208,24 +161,22 @@ const InputArea: React.FC<InputAreaProps> = ({
               <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Offline</span>
             </div>
           </div>
-
-          {/* Model Selection */}
+          {}
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-600 dark:text-gray-400">Model:</span>
             <div className="relative">
               <button
-                onClick={() => {}} // No model selection
+                onClick={() => {}}
                 className="flex items-center space-x-1 px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               >
                 <span>{currentModel}</span>
                 <ChevronDown className="w-3 h-3" />
               </button>
-              {/* No dropdowns to show */}
+              {}
             </div>
           </div>
         </div>
-
-        {/* Connection Status Indicator */}
+        {}
         <div className="flex items-center space-x-1">
           <div className={cn(
             "w-2 h-2 rounded-full",
@@ -236,7 +187,6 @@ const InputArea: React.FC<InputAreaProps> = ({
           </span>
         </div>
       </div>
-
       <div className="flex items-end space-x-2">
         <div className="flex-1">
           <textarea
@@ -261,8 +211,7 @@ const InputArea: React.FC<InputAreaProps> = ({
             }}
           />
         </div>
-        
-        {/* VOICE CHAT TOGGLE BUTTON */}
+        {}
         {isVoiceEnabled && (
           <button
             type="button"
@@ -280,8 +229,7 @@ const InputArea: React.FC<InputAreaProps> = ({
             <Mic className="w-5 h-5" />
           </button>
         )}
-
-        {/* REALTIME VOICE CONVERSATION BUTTON */}
+        {}
         {isVoiceEnabled && onRealtimeVoiceToggle && (
           <button
             type="button"
@@ -296,8 +244,7 @@ const InputArea: React.FC<InputAreaProps> = ({
             <MessageCircle className="w-5 h-5" />
           </button>
         )}
-
-        {/* Voice Input Button */}
+        {}
         <button
           type="button"
           onClick={handleVoiceInputToggle}
@@ -313,7 +260,6 @@ const InputArea: React.FC<InputAreaProps> = ({
         >
           <Mic className={cn("w-5 h-5", isVoiceInputActive && "animate-pulse")} />
         </button>
-
         <button
           type="button"
           onClick={handleSendMessage}
@@ -328,8 +274,7 @@ const InputArea: React.FC<InputAreaProps> = ({
           <Send className="w-5 h-5" />
         </button>
       </div>
-
-      {/* Voice Chat Component */}
+      {}
       {showVoiceChat && (
         <div className="mt-4">
           <VoiceChat
@@ -343,5 +288,4 @@ const InputArea: React.FC<InputAreaProps> = ({
     </div>
   );
 };
-
 export default InputArea;

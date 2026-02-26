@@ -1,0 +1,348 @@
+src/App.tsx(22,9): error TS6133: 'loadSettings' is declared but its value is never read.
+src/App.tsx(23,9): error TS6133: 'initializeStore' is declared but its value is never read.
+src/components/AudioDiagnosticPanel.tsx(1,27): error TS6133: 'useEffect' is declared but its value is never read.
+src/components/AudioDiagnosticPanel.tsx(2,10): error TS6133: 'Mic' is declared but its value is never read.
+src/components/AudioDiagnosticPanel.tsx(2,15): error TS6133: 'MicOff' is declared but its value is never read.
+src/components/AudioDiagnosticPanel.tsx(2,23): error TS6133: 'Volume2' is declared but its value is never read.
+src/components/AudioDiagnosticPanel.tsx(2,32): error TS6133: 'VolumeX' is declared but its value is never read.
+src/components/AudioDiagnosticPanel.tsx(25,5): error TS6133: 'micPermission' is declared but its value is never read.
+src/components/AudioDiagnosticPanel.tsx(28,5): error TS6133: 'startRecording' is declared but its value is never read.
+src/components/AudioDiagnosticPanel.tsx(29,5): error TS6133: 'stopRecording' is declared but its value is never read.
+src/components/AudioDiagnosticPanel.tsx(30,5): error TS6133: 'isRecording' is declared but its value is never read.
+src/components/AudioDiagnosticPanel.tsx(31,5): error TS6133: 'finalText' is declared but its value is never read.
+src/components/AudioDiagnosticPanel.tsx(32,12): error TS6133: 'sttError' is declared but its value is never read.
+src/components/AudioDiagnosticPanel.tsx(70,11): error TS18047: 'backendHealth' is possibly 'null'.
+src/components/AudioDiagnosticPanel.tsx(70,25): error TS2339: Property 'isHealthy' does not exist on type 'BackendHealthResponse'.
+src/components/AudioDiagnosticPanel.tsx(73,81): error TS18047: 'backendHealth' is possibly 'null'.
+src/components/AudioDiagnosticPanel.tsx(73,95): error TS2339: Property 'error' does not exist on type 'BackendHealthResponse'.
+src/components/CapabilitiesStatusPanel.tsx(44,10): error TS6133: 'toolMetrics' is declared but its value is never read.
+src/components/CapabilitiesStatusPanel.tsx(50,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size?: number | undefined; className?: string | undefined; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size?: number | undefined; className?: string | undefined; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number | null | undefined> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number | null | undefined>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number | null | undefined'.
+                  Type 'string' is not assignable to type 'number'.
+src/components/CapabilitiesStatusPanel.tsx(57,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size?: number | undefined; className?: string | undefined; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size?: number | undefined; className?: string | undefined; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number | null | undefined> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number | null | undefined>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number | null | undefined'.
+                  Type 'string' is not assignable to type 'number'.
+src/components/CapabilitiesStatusPanel.tsx(64,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size?: number | undefined; className?: string | undefined; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size?: number | undefined; className?: string | undefined; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number | null | undefined> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number | null | undefined>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number | null | undefined'.
+                  Type 'string' is not assignable to type 'number'.
+src/components/CapabilitiesStatusPanel.tsx(71,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size?: number | undefined; className?: string | undefined; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size?: number | undefined; className?: string | undefined; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number | null | undefined> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number | null | undefined>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number | null | undefined'.
+                  Type 'string' is not assignable to type 'number'.
+src/components/CapabilitiesStatusPanel.tsx(78,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size?: number | undefined; className?: string | undefined; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size?: number | undefined; className?: string | undefined; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number | null | undefined> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number | null | undefined>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number | null | undefined'.
+                  Type 'string' is not assignable to type 'number'.
+src/components/CapabilitiesStatusPanel.tsx(98,11): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size?: number | undefined; className?: string | undefined; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size?: number | undefined; className?: string | undefined; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number | null | undefined> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number | null | undefined>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number | null | undefined'.
+                  Type 'string' is not assignable to type 'number'.
+src/components/CapabilitiesStatusPanel.tsx(106,11): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size?: number | undefined; className?: string | undefined; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size?: number | undefined; className?: string | undefined; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number | null | undefined> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number | null | undefined>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number | null | undefined'.
+                  Type 'string' is not assignable to type 'number'.
+src/components/CapabilitiesStatusPanel.tsx(114,11): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size?: number | undefined; className?: string | undefined; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size?: number | undefined; className?: string | undefined; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number | null | undefined> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number | null | undefined>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number | null | undefined'.
+                  Type 'string' is not assignable to type 'number'.
+src/components/CapabilitiesStatusPanel.tsx(122,11): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size?: number | undefined; className?: string | undefined; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size?: number | undefined; className?: string | undefined; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number | null | undefined> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number | null | undefined>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number | null | undefined'.
+                  Type 'string' is not assignable to type 'number'.
+src/components/CapabilitiesStatusPanel.tsx(130,11): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size?: number | undefined; className?: string | undefined; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size?: number | undefined; className?: string | undefined; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size?: number | undefined; className?: string | undefined; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number | null | undefined> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number | null | undefined>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number | null | undefined'.
+                  Type 'string' is not assignable to type 'number'.
+src/components/CapabilitiesStatusPanel.tsx(153,13): error TS6133: 'status' is declared but its value is never read.
+src/components/ChatInterface.tsx(12,20): error TS6133: 'WifiOff' is declared but its value is never read.
+src/components/ChatInterface.tsx(12,34): error TS6133: 'Globe' is declared but its value is never read.
+src/components/ChatInterface.tsx(12,41): error TS6133: 'Package' is declared but its value is never read.
+src/components/ChatInterface.tsx(29,5): error TS6133: 'llmPreferences' is declared but its value is never read.
+src/components/ChatInterface.tsx(30,5): error TS6133: 'setPreferredProvider' is declared but its value is never read.
+src/components/ChatInterface.tsx(34,9): error TS6133: 'enhancedChatStore' is declared but its value is never read.
+src/components/ChatInterface.tsx(36,10): error TS6133: 'networkStatus' is declared but its value is never read.
+src/components/ChatInterface.tsx(45,23): error TS6133: 'setShowSidebar' is declared but its value is never read.
+src/components/ChatInterface.tsx(90,17): error TS6133: 'fullResponse' is declared but its value is never read.
+src/components/ChatInterface.tsx(95,51): error TS6133: 'metadata' is declared but its value is never read.
+src/components/ChatInterface.tsx(101,47): error TS6133: 'metadata' is declared but its value is never read.
+src/components/EnhancedChatInterface.tsx(30,3): error TS6133: 'Pause' is declared but its value is never read.
+src/components/EnhancedChatInterface.tsx(31,3): error TS6133: 'Play' is declared but its value is never read.
+src/components/EnhancedChatInterface.tsx(57,5): error TS6133: 'chatSessions' is declared but its value is never read.
+src/components/EnhancedChatInterface.tsx(70,5): error TS6133: 'calculateTokenUsage' is declared but its value is never read.
+src/components/EnhancedChatInterface.tsx(76,27): error TS6133: 'setPreferredProvider' is declared but its value is never read.
+src/components/EnhancedChatInterface.tsx(76,65): error TS6133: 'setPluginsEnabled' is declared but its value is never read.
+src/components/EnhancedChatInterface.tsx(198,10): error TS6133: 'currentAssistantMessageId' is declared but its value is never read.
+src/components/EnhancedChatInterface.tsx(240,13): error TS6133: 'userMessageId' is declared but its value is never read.
+src/components/EnhancedChatInterface.tsx(338,50): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+src/components/EnhancedChatInterface.tsx(431,19): error TS2322: Type 'Date | null' is not assignable to type 'Date | undefined'.
+  Type 'null' is not assignable to type 'Date | undefined'.
+src/components/EnhancedPluginPanel.tsx(8,3): error TS6133: 'Info' is declared but its value is never read.
+src/components/EnhancedPluginPanel.tsx(11,3): error TS6133: 'Upload' is declared but its value is never read.
+src/components/EnhancedPluginPanel.tsx(15,3): error TS6133: 'Filter' is declared but its value is never read.
+src/components/EnhancedPluginPanel.tsx(341,60): error TS6133: 'pluginId' is declared but its value is never read.
+src/components/EnhancedSidebar.tsx(17,3): error TS6133: 'Upload' is declared but its value is never read.
+src/components/EnhancedSidebar.tsx(19,3): error TS6133: 'Filter' is declared but its value is never read.
+src/components/EnhancedSidebar.tsx(21,3): error TS6133: 'Settings' is declared but its value is never read.
+src/components/EnhancedSidebar.tsx(270,10): error TS6133: 'showPluginSidebar' is declared but its value is never read.
+src/components/EnhancedSidebar.tsx(273,10): error TS6133: 'extractedContent' is declared but its value is never read.
+src/components/EnhancedSidebar.tsx(275,10): error TS6133: 'showAllChats' is declared but its value is never read.
+src/components/EnhancedSidebar.tsx(275,24): error TS6133: 'setShowAllChats' is declared but its value is never read.
+src/components/EnhancedSidebar.tsx(297,5): error TS6133: 'exportAllChats' is declared but its value is never read.
+src/components/EnhancedVoiceModal.tsx(5,3): error TS6133: 'MicOff' is declared but its value is never read.
+src/components/EnhancedVoiceModal.tsx(9,3): error TS6133: 'Play' is declared but its value is never read.
+src/components/EnhancedVoiceModal.tsx(10,3): error TS6133: 'Pause' is declared but its value is never read.
+src/components/EnhancedVoiceModal.tsx(31,3): error TS6133: 'onSendMessage' is declared but its value is never read.
+src/components/EnhancedVoiceModal.tsx(45,5): error TS6133: 'requestMicrophonePermission' is declared but its value is never read.
+src/components/HardwareStatusBadge.tsx(8,3): error TS6133: 'XCircle' is declared but its value is never read.
+src/components/HardwareStatusBadge.tsx(57,10): error TS6133: 'error' is declared but its value is never read.
+src/components/InputArea.tsx(2,27): error TS6133: 'WifiOff' is declared but its value is never read.
+src/components/InputArea.tsx(4,1): error TS6133: 'useAppStore' is declared but its value is never read.
+src/components/InputArea.tsx(5,1): error TS6133: 'llmRouter' is declared but its value is never read.
+src/components/InputArea.tsx(19,3): error TS6133: 'onVoiceRecord' is declared but its value is never read.
+src/components/MessageBubble.tsx(3,52): error TS6133: 'Loader2' is declared but its value is never read.
+src/components/RealtimeVoiceConversation.tsx(2,44): error TS6133: 'Settings' is declared but its value is never read.
+src/components/RealtimeVoiceConversation.tsx(2,54): error TS6133: 'Play' is declared but its value is never read.
+src/components/RealtimeVoiceConversation.tsx(2,60): error TS6133: 'Pause' is declared but its value is never read.
+src/components/RealtimeVoiceConversation.tsx(2,67): error TS6133: 'Square' is declared but its value is never read.
+src/components/RealtimeVoiceConversation.tsx(26,10): error TS6133: 'conversationStats' is declared but its value is never read.
+src/components/RealtimeVoiceConversation.tsx(26,29): error TS6133: 'setConversationStats' is declared but its value is never read.
+src/components/RealtimeVoiceConversation.tsx(31,10): error TS6133: 'isLoading' is declared but its value is never read.
+src/components/RealtimeVoiceConversation.tsx(34,9): error TS6133: 'settings' is declared but its value is never read.
+src/components/RealtimeVoiceConversation.tsx(42,12): error TS6133: 'sttError' is declared but its value is never read.
+src/components/RealtimeVoiceConversation.tsx(50,5): error TS6133: 'ttsState' is declared but its value is never read.
+src/components/SystemSettingsPanel.tsx(12,3): error TS6133: 'CheckCircle' is declared but its value is never read.
+src/components/SystemSettingsPanel.tsx(245,28): error TS18048: 'localSettings.behaviorSettings' is possibly 'undefined'.
+src/components/SystemSettingsPanel.tsx(246,55): error TS2345: Argument of type '(prev: SystemInstructions | null) => { behaviorSettings: { responseStyle: any; creativityLevel?: number | undefined; useEmojis?: boolean | undefined; includeThinking?: boolean | undefined; }; ... 6 more ...; contextSettings?: { ...; } | undefined; } | null' is not assignable to parameter of type 'SetStateAction<SystemInstructions | null>'.
+  Type '(prev: SystemInstructions | null) => { behaviorSettings: { responseStyle: any; creativityLevel?: number | undefined; useEmojis?: boolean | undefined; includeThinking?: boolean | undefined; }; ... 6 more ...; contextSettings?: { ...; } | undefined; } | null' is not assignable to type '(prevState: SystemInstructions | null) => SystemInstructions | null'.
+    Type '{ behaviorSettings: { responseStyle: any; creativityLevel?: number | undefined; useEmojis?: boolean | undefined; includeThinking?: boolean | undefined; }; systemPrompt: string; promptTemplate: string; ... 4 more ...; contextSettings?: { ...; } | undefined; } | null' is not assignable to type 'SystemInstructions | null'.
+      Type '{ behaviorSettings: { responseStyle: any; creativityLevel?: number | undefined; useEmojis?: boolean | undefined; includeThinking?: boolean | undefined; }; systemPrompt: string; promptTemplate: string; ... 4 more ...; contextSettings?: { maxContextLength: number; includeSystemInfo: boolean; includeChatHistory: boolea...' is not assignable to type 'SystemInstructions'.
+        The types of 'behaviorSettings.creativityLevel' are incompatible between these types.
+          Type 'number | undefined' is not assignable to type 'number'.
+            Type 'undefined' is not assignable to type 'number'.
+src/components/SystemSettingsPanel.tsx(262,51): error TS18048: 'localSettings.behaviorSettings' is possibly 'undefined'.
+src/components/SystemSettingsPanel.tsx(269,28): error TS18048: 'localSettings.behaviorSettings' is possibly 'undefined'.
+src/components/SystemSettingsPanel.tsx(270,55): error TS2345: Argument of type '(prev: SystemInstructions | null) => { behaviorSettings: { creativityLevel: number; responseStyle?: string | undefined; useEmojis?: boolean | undefined; includeThinking?: boolean | undefined; }; ... 6 more ...; contextSettings?: { ...; } | undefined; } | null' is not assignable to parameter of type 'SetStateAction<SystemInstructions | null>'.
+  Type '(prev: SystemInstructions | null) => { behaviorSettings: { creativityLevel: number; responseStyle?: string | undefined; useEmojis?: boolean | undefined; includeThinking?: boolean | undefined; }; ... 6 more ...; contextSettings?: { ...; } | undefined; } | null' is not assignable to type '(prevState: SystemInstructions | null) => SystemInstructions | null'.
+    Type '{ behaviorSettings: { creativityLevel: number; responseStyle?: string | undefined; useEmojis?: boolean | undefined; includeThinking?: boolean | undefined; }; systemPrompt: string; ... 5 more ...; contextSettings?: { ...; } | undefined; } | null' is not assignable to type 'SystemInstructions | null'.
+      Type '{ behaviorSettings: { creativityLevel: number; responseStyle?: string | undefined; useEmojis?: boolean | undefined; includeThinking?: boolean | undefined; }; systemPrompt: string; promptTemplate: string; ... 4 more ...; contextSettings?: { maxContextLength: number; includeSystemInfo: boolean; includeChatHistory: boo...' is not assignable to type 'SystemInstructions'.
+        The types of 'behaviorSettings.responseStyle' are incompatible between these types.
+          Type 'string | undefined' is not assignable to type 'string'.
+            Type 'undefined' is not assignable to type 'string'.
+src/components/SystemSettingsPanel.tsx(289,32): error TS18048: 'localSettings.behaviorSettings' is possibly 'undefined'.
+src/components/SystemSettingsPanel.tsx(290,57): error TS2345: Argument of type '(prev: SystemInstructions | null) => { behaviorSettings: { useEmojis: boolean; responseStyle?: string | undefined; creativityLevel?: number | undefined; includeThinking?: boolean | undefined; }; ... 6 more ...; contextSettings?: { ...; } | undefined; } | null' is not assignable to parameter of type 'SetStateAction<SystemInstructions | null>'.
+  Type '(prev: SystemInstructions | null) => { behaviorSettings: { useEmojis: boolean; responseStyle?: string | undefined; creativityLevel?: number | undefined; includeThinking?: boolean | undefined; }; ... 6 more ...; contextSettings?: { ...; } | undefined; } | null' is not assignable to type '(prevState: SystemInstructions | null) => SystemInstructions | null'.
+    Type '{ behaviorSettings: { useEmojis: boolean; responseStyle?: string | undefined; creativityLevel?: number | undefined; includeThinking?: boolean | undefined; }; systemPrompt: string; ... 5 more ...; contextSettings?: { ...; } | undefined; } | null' is not assignable to type 'SystemInstructions | null'.
+      Type '{ behaviorSettings: { useEmojis: boolean; responseStyle?: string | undefined; creativityLevel?: number | undefined; includeThinking?: boolean | undefined; }; systemPrompt: string; promptTemplate: string; ... 4 more ...; contextSettings?: { maxContextLength: number; includeSystemInfo: boolean; includeChatHistory: boo...' is not assignable to type 'SystemInstructions'.
+        The types of 'behaviorSettings.responseStyle' are incompatible between these types.
+          Type 'string | undefined' is not assignable to type 'string'.
+            Type 'undefined' is not assignable to type 'string'.
+src/components/SystemSettingsPanel.tsx(307,32): error TS18048: 'localSettings.behaviorSettings' is possibly 'undefined'.
+src/components/SystemSettingsPanel.tsx(308,57): error TS2345: Argument of type '(prev: SystemInstructions | null) => { behaviorSettings: { includeThinking: boolean; responseStyle?: string | undefined; creativityLevel?: number | undefined; useEmojis?: boolean | undefined; }; ... 6 more ...; contextSettings?: { ...; } | undefined; } | null' is not assignable to parameter of type 'SetStateAction<SystemInstructions | null>'.
+  Type '(prev: SystemInstructions | null) => { behaviorSettings: { includeThinking: boolean; responseStyle?: string | undefined; creativityLevel?: number | undefined; useEmojis?: boolean | undefined; }; ... 6 more ...; contextSettings?: { ...; } | undefined; } | null' is not assignable to type '(prevState: SystemInstructions | null) => SystemInstructions | null'.
+    Type '{ behaviorSettings: { includeThinking: boolean; responseStyle?: string | undefined; creativityLevel?: number | undefined; useEmojis?: boolean | undefined; }; systemPrompt: string; ... 5 more ...; contextSettings?: { ...; } | undefined; } | null' is not assignable to type 'SystemInstructions | null'.
+      Type '{ behaviorSettings: { includeThinking: boolean; responseStyle?: string | undefined; creativityLevel?: number | undefined; useEmojis?: boolean | undefined; }; systemPrompt: string; promptTemplate: string; ... 4 more ...; contextSettings?: { maxContextLength: number; includeSystemInfo: boolean; includeChatHistory: boo...' is not assignable to type 'SystemInstructions'.
+        The types of 'behaviorSettings.responseStyle' are incompatible between these types.
+          Type 'string | undefined' is not assignable to type 'string'.
+            Type 'undefined' is not assignable to type 'string'.
+src/components/SystemSettingsPanel.tsx(335,28): error TS18048: 'localSettings.contextSettings' is possibly 'undefined'.
+src/components/SystemSettingsPanel.tsx(336,55): error TS2345: Argument of type '(prev: SystemInstructions | null) => { contextSettings: { maxContextLength: number; includeSystemInfo?: boolean | undefined; includeChatHistory?: boolean | undefined; }; ... 6 more ...; behaviorSettings?: { ...; } | undefined; } | null' is not assignable to parameter of type 'SetStateAction<SystemInstructions | null>'.
+  Type '(prev: SystemInstructions | null) => { contextSettings: { maxContextLength: number; includeSystemInfo?: boolean | undefined; includeChatHistory?: boolean | undefined; }; ... 6 more ...; behaviorSettings?: { ...; } | undefined; } | null' is not assignable to type '(prevState: SystemInstructions | null) => SystemInstructions | null'.
+    Type '{ contextSettings: { maxContextLength: number; includeSystemInfo?: boolean | undefined; includeChatHistory?: boolean | undefined; }; systemPrompt: string; promptTemplate: string; contextWindow?: number | undefined; maxTokens?: number | undefined; temperature?: number | undefined; topP?: number | undefined; behaviorS...' is not assignable to type 'SystemInstructions | null'.
+      Type '{ contextSettings: { maxContextLength: number; includeSystemInfo?: boolean | undefined; includeChatHistory?: boolean | undefined; }; systemPrompt: string; promptTemplate: string; contextWindow?: number; maxTokens?: number; temperature?: number; topP?: number; behaviorSettings?: { responseStyle: string; creativityLev...' is not assignable to type 'SystemInstructions'.
+        The types of 'contextSettings.includeSystemInfo' are incompatible between these types.
+          Type 'boolean | undefined' is not assignable to type 'boolean'.
+            Type 'undefined' is not assignable to type 'boolean'.
+src/components/SystemSettingsPanel.tsx(354,32): error TS18048: 'localSettings.contextSettings' is possibly 'undefined'.
+src/components/SystemSettingsPanel.tsx(355,57): error TS2345: Argument of type '(prev: SystemInstructions | null) => { contextSettings: { includeSystemInfo: boolean; maxContextLength?: number | undefined; includeChatHistory?: boolean | undefined; }; ... 6 more ...; behaviorSettings?: { ...; } | undefined; } | null' is not assignable to parameter of type 'SetStateAction<SystemInstructions | null>'.
+  Type '(prev: SystemInstructions | null) => { contextSettings: { includeSystemInfo: boolean; maxContextLength?: number | undefined; includeChatHistory?: boolean | undefined; }; ... 6 more ...; behaviorSettings?: { ...; } | undefined; } | null' is not assignable to type '(prevState: SystemInstructions | null) => SystemInstructions | null'.
+    Type '{ contextSettings: { includeSystemInfo: boolean; maxContextLength?: number | undefined; includeChatHistory?: boolean | undefined; }; systemPrompt: string; promptTemplate: string; contextWindow?: number | undefined; maxTokens?: number | undefined; temperature?: number | undefined; topP?: number | undefined; behaviorS...' is not assignable to type 'SystemInstructions | null'.
+      Type '{ contextSettings: { includeSystemInfo: boolean; maxContextLength?: number | undefined; includeChatHistory?: boolean | undefined; }; systemPrompt: string; promptTemplate: string; contextWindow?: number; maxTokens?: number; temperature?: number; topP?: number; behaviorSettings?: { responseStyle: string; creativityLev...' is not assignable to type 'SystemInstructions'.
+        The types of 'contextSettings.maxContextLength' are incompatible between these types.
+          Type 'number | undefined' is not assignable to type 'number'.
+            Type 'undefined' is not assignable to type 'number'.
+src/components/SystemSettingsPanel.tsx(372,32): error TS18048: 'localSettings.contextSettings' is possibly 'undefined'.
+src/components/SystemSettingsPanel.tsx(373,57): error TS2345: Argument of type '(prev: SystemInstructions | null) => { contextSettings: { includeChatHistory: boolean; maxContextLength?: number | undefined; includeSystemInfo?: boolean | undefined; }; ... 6 more ...; behaviorSettings?: { ...; } | undefined; } | null' is not assignable to parameter of type 'SetStateAction<SystemInstructions | null>'.
+  Type '(prev: SystemInstructions | null) => { contextSettings: { includeChatHistory: boolean; maxContextLength?: number | undefined; includeSystemInfo?: boolean | undefined; }; ... 6 more ...; behaviorSettings?: { ...; } | undefined; } | null' is not assignable to type '(prevState: SystemInstructions | null) => SystemInstructions | null'.
+    Type '{ contextSettings: { includeChatHistory: boolean; maxContextLength?: number | undefined; includeSystemInfo?: boolean | undefined; }; systemPrompt: string; promptTemplate: string; contextWindow?: number | undefined; maxTokens?: number | undefined; temperature?: number | undefined; topP?: number | undefined; behaviorS...' is not assignable to type 'SystemInstructions | null'.
+      Type '{ contextSettings: { includeChatHistory: boolean; maxContextLength?: number | undefined; includeSystemInfo?: boolean | undefined; }; systemPrompt: string; promptTemplate: string; contextWindow?: number; maxTokens?: number; temperature?: number; topP?: number; behaviorSettings?: { responseStyle: string; creativityLev...' is not assignable to type 'SystemInstructions'.
+        The types of 'contextSettings.maxContextLength' are incompatible between these types.
+          Type 'number | undefined' is not assignable to type 'number'.
+            Type 'undefined' is not assignable to type 'number'.
+src/components/ThinkingIndicator.tsx(13,3): error TS6133: 'streamingText' is declared but its value is never read.
+src/components/ThinkingIndicator.tsx(14,3): error TS6133: 'isStreaming' is declared but its value is never read.
+src/components/ToolDashboard.tsx(5,3): error TS6133: 'Upload' is declared but its value is never read.
+src/components/ToolDashboard.tsx(6,3): error TS6133: 'Download' is declared but its value is never read.
+src/components/ToolDashboard.tsx(46,21): error TS6133: 'setIsLoading' is declared but its value is never read.
+src/components/ToolDashboard.tsx(49,10): error TS6133: 'isExecuting' is declared but its value is never read.
+src/components/VoiceChat.tsx(4,3): error TS6133: 'MicOff' is declared but its value is never read.
+src/components/VoiceChat.tsx(6,3): error TS6133: 'VolumeX' is declared but its value is never read.
+src/components/VoiceChat.tsx(8,3): error TS6133: 'Pause' is declared but its value is never read.
+src/components/VoiceChat.tsx(13,3): error TS6133: 'Clock' is declared but its value is never read.
+src/components/VoiceChat.tsx(15,3): error TS6133: 'Zap' is declared but its value is never read.
+src/components/VoiceRecordingModal.tsx(20,10): error TS6133: 'error' is declared but its value is never read.
+src/components/dashboards/BrowserDashboard.tsx(2,72): error TS6133: 'ArrowLeft' is declared but its value is never read.
+src/components/dashboards/BrowserDashboard.tsx(2,83): error TS6133: 'ArrowRight' is declared but its value is never read.
+src/components/dashboards/NotesDashboard.tsx(2,57): error TS6133: 'Calendar' is declared but its value is never read.
+src/components/dashboards/NotesDashboard.tsx(2,83): error TS6133: 'Eye' is declared but its value is never read.
+src/components/dashboards/NotesDashboard.tsx(28,22): error TS6133: 'setFilterTags' is declared but its value is never read.
+src/components/dashboards/NotesDashboard.tsx(30,18): error TS6133: 'setSortBy' is declared but its value is never read.
+src/components/dashboards/NotesDashboard.tsx(31,21): error TS6133: 'setSortOrder' is declared but its value is never read.
+src/components/dashboards/NotesDashboard.tsx(235,9): error TS6133: 'allTags' is declared but its value is never read.
+src/components/dashboards/NotesDashboard.tsx(236,9): error TS6133: 'totalNotes' is declared but its value is never read.
+src/components/dashboards/NotesDashboard.tsx(237,9): error TS6133: 'totalWords' is declared but its value is never read.
+src/components/dashboards/NotesDashboard.tsx(238,9): error TS6133: 'favoriteNotes' is declared but its value is never read.
+src/components/dashboards/PersonalInfoDashboard.tsx(2,73): error TS6133: 'Unlock' is declared but its value is never read.
+src/components/dashboards/PersonalInfoDashboard.tsx(2,81): error TS6133: 'Key' is declared but its value is never read.
+src/components/dashboards/PersonalInfoDashboard.tsx(2,92): error TS6133: 'Phone' is declared but its value is never read.
+src/components/dashboards/PersonalInfoDashboard.tsx(2,99): error TS6133: 'MapPin' is declared but its value is never read.
+src/components/dashboards/PersonalInfoDashboard.tsx(2,107): error TS6133: 'Calendar' is declared but its value is never read.
+src/components/dashboards/PersonalInfoDashboard.tsx(229,9): error TS6133: 'getCategoryIcon' is declared but its value is never read.
+src/components/dashboards/TodoDashboard.tsx(27,10): error TS6133: 'editingTodo' is declared but its value is never read.
+src/components/dashboards/TodoDashboard.tsx(129,9): error TS6133: 'updateTodo' is declared but its value is never read.
+src/core/agents/llmRouter.ts(2,33): error TS6133: 'LLMConfig' is declared but its value is never read.
+src/core/agents/llmRouter.ts(43,5): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
+  Type 'string' is not assignable to type 'boolean'.
+src/core/agents/llmRouter.ts(143,53): error TS6133: 'systemPrompt' is declared but its value is never read.
+src/core/agents/llmRouter.ts(150,9): error TS2322: Type 'unknown' is not assignable to type 'string | undefined'.
+src/core/agents/llmRouter.ts(151,9): error TS2322: Type 'string' is not assignable to type 'LLMModel'.
+src/core/agents/llmRouter.ts(175,9): error TS2322: Type 'string' is not assignable to type 'LLMModel'.
+src/core/agents/llmRouter.ts(258,11): error TS6133: 'determineProvider' is declared but its value is never read.
+src/core/agents/llmRouter.ts(287,11): error TS6133: 'getModelForProvider' is declared but its value is never read.
+src/core/agents/llmRouter.ts(287,31): error TS6133: 'provider' is declared but its value is never read.
+src/core/agents/llmRouter.ts(362,15): error TS6133: 'response' is declared but its value is never read.
+src/core/agents/pluginRunner.ts(1,25): error TS6133: 'PluginResult' is declared but its value is never read.
+src/core/plugins/loader.ts(1,18): error TS6133: 'PluginManifest' is declared but its value is never read.
+src/hooks/useAdaptiveStreaming.ts(67,9): error TS6133: 'startLocalOnlyStream' is declared but its value is never read.
+src/hooks/useAdaptiveStreaming.ts(76,13): error TS6133: 'selectedModel' is declared but its value is never read.
+src/hooks/useEnhancedStreaming.ts(153,15): error TS6133: 'mode' is declared but its value is never read.
+src/hooks/useEnhancedStreaming.ts(416,15): error TS6133: 'result' is declared but its value is never read.
+src/hooks/useEnhancedStreaming.ts(598,9): error TS6133: 'executeWebSocketStreaming' is declared but its value is never read.
+src/hooks/useEnhancedVoice.ts(33,5): error TS2322: Type 'string | undefined' is not assignable to type '"web-speech" | "vosk" | "whisper"'.
+  Type 'undefined' is not assignable to type '"web-speech" | "vosk" | "whisper"'.
+src/hooks/useEnhancedVoice.ts(39,39): error TS2304: Cannot find name 'SpeechRecognition'.
+src/hooks/useEnhancedVoice.ts(50,33): error TS18048: 'settings.voiceConfig.sttLanguage' is possibly 'undefined'.
+src/hooks/useEnhancedVoice.ts(115,38): error TS2339: Property 'SpeechRecognition' does not exist on type '(Window & typeof globalThis & Record<"webkitSpeechRecognition", unknown>) | (Window & typeof globalThis & Record<"SpeechRecognition", unknown>)'.
+  Property 'SpeechRecognition' does not exist on type 'Window & typeof globalThis & Record<"webkitSpeechRecognition", unknown>'.
+src/hooks/useEnhancedVoice.ts(115,66): error TS2339: Property 'webkitSpeechRecognition' does not exist on type '(Window & typeof globalThis & Record<"webkitSpeechRecognition", unknown>) | (Window & typeof globalThis & Record<"SpeechRecognition", unknown>)'.
+  Property 'webkitSpeechRecognition' does not exist on type 'Window & typeof globalThis & Record<"SpeechRecognition", unknown>'.
+src/hooks/useEnhancedVoice.ts(124,29): error TS7006: Parameter 'event' implicitly has an 'any' type.
+src/hooks/useEnhancedVoice.ts(147,28): error TS7006: Parameter 'event' implicitly has an 'any' type.
+src/hooks/useEnhancedVoice.ts(346,25): error TS2353: Object literal may only specify known properties, and 'ttsVoice' does not exist in type 'Partial<VoiceConfig>'.
+src/plugins/fileReader/index.ts(16,28): error TS6133: 'context' is declared but its value is never read.
+src/plugins/fileReader/index.ts(21,38): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/plugins/fileReader/index.ts(23,41): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/plugins/fileReader/index.ts(25,41): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/plugins/fileWriter/index.ts(16,28): error TS6133: 'context' is declared but its value is never read.
+src/plugins/noteTaker/index.ts(27,28): error TS6133: 'context' is declared but its value is never read.
+src/plugins/noteTaker/index.ts(32,38): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/plugins/noteTaker/index.ts(36,41): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/plugins/noteTaker/index.ts(38,40): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/plugins/noteTaker/index.ts(40,37): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/plugins/pluginInspector/index.ts(15,28): error TS6133: 'context' is declared but its value is never read.
+src/plugins/pluginInspector/index.ts(22,43): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/plugins/pluginInspector/index.ts(24,43): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/plugins/todoList/index.ts(26,28): error TS6133: 'context' is declared but its value is never read.
+src/plugins/todoList/index.ts(31,37): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/plugins/todoList/index.ts(35,40): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/plugins/todoList/index.ts(37,42): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/services/geminiApi.ts(1,47): error TS6133: 'GenerateContentStreamResult' is declared but its value is never read.
+src/services/geminiApi.ts(5,3): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
+  Type 'string' is not assignable to type 'boolean'.
+src/services/geminiApi.ts(124,17): error TS6133: 'streamId' is declared but its value is never read.
+src/services/geminiApi.ts(181,13): error TS6133: 'result' is declared but its value is never read.
+src/stores/enhancedChatStore.ts(333,49): error TS2554: Expected 1 arguments, but got 2.
+src/stores/enhancedChatStore.ts(386,47): error TS2554: Expected 1 arguments, but got 2.
+src/stores/enhancedChatStore.ts(389,23): error TS6133: 'id' is declared but its value is never read.
+src/stores/enhancedChatStore.ts(444,39): error TS2554: Expected 1 arguments, but got 2.
+src/stores/enhancedChatStore.ts(497,42): error TS2339: Property 'metadata' does not exist on type 'ChatSessionSummary'.
+src/stores/enhancedChatStore.ts(503,39): error TS2554: Expected 1 arguments, but got 2.
+src/stores/enhancedChatStore.ts(537,29): error TS6133: 'chatId' is declared but its value is never read.
+src/stores/enhancedChatStore.ts(540,44): error TS6133: 'prompt' is declared but its value is never read.
+src/stores/enhancedChatStore.ts(540,60): error TS6133: 'systemPrompt' is declared but its value is never read.
+src/stores/enhancedChatStore.ts(543,36): error TS6133: 'chatId' is declared but its value is never read.
+src/stores/enhancedChatStore.ts(543,52): error TS6133: 'content' is declared but its value is never read.
+src/stores/enhancedChatStore.ts(543,69): error TS6133: 'role' is declared but its value is never read.
+src/stores/enhancedChatStore.ts(545,40): error TS6133: 'input' is declared but its value is never read.
+src/stores/enhancedChatStore.ts(545,55): error TS6133: 'context' is declared but its value is never read.
+src/stores/enhancedChatStore.ts(548,31): error TS6133: 'chats' is declared but its value is never read.
+src/utils/accessibility.ts(58,27): error TS6133: 'event' is declared but its value is never read.
+src/utils/privacyManager.ts(162,12): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.
+src/utils/privacyManager.ts(166,36): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.
+src/utils/privacyManager.ts(166,42): error TS2345: Argument of type '[string, string | URL, ...any[]]' is not assignable to parameter of type '[method: string, url: string | URL, async: boolean, username?: string | null | undefined, password?: string | null | undefined]'.
+  Target requires 3 element(s) but source may have fewer.

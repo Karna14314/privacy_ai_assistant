@@ -1,24 +1,20 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Bug, Copy } from 'lucide-react';
-
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
 }
-
 interface State {
   hasError: boolean;
   error: Error | null;
   errorInfo: ErrorInfo | null;
 }
-
 class ErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,
     error: null,
     errorInfo: null,
   };
-
   public static getDerivedStateFromError(error: Error): State {
     return {
       hasError: true,
@@ -26,19 +22,14 @@ class ErrorBoundary extends Component<Props, State> {
       errorInfo: null,
     };
   }
-
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('🚨 Error Boundary caught an error:', error, errorInfo);
-    
+    console.error(' Error Boundary caught an error:', error, errorInfo);
     this.setState({
       error,
       errorInfo,
     });
-
-    // Log error details for debugging
     this.logErrorDetails(error, errorInfo);
   }
-
   private logErrorDetails = (error: Error, errorInfo: ErrorInfo) => {
     const errorDetails = {
       message: error.message,
@@ -48,18 +39,14 @@ class ErrorBoundary extends Component<Props, State> {
       userAgent: navigator.userAgent,
       url: window.location.href,
     };
-
-    console.group('🔍 Error Boundary Details');
+    console.group(' Error Boundary Details');
     console.error('Error:', error);
     console.error('Error Info:', errorInfo);
     console.error('Full Details:', errorDetails);
     console.groupEnd();
-
-    // Store error in localStorage for debugging
     try {
       const existingErrors = JSON.parse(localStorage.getItem('app_errors') || '[]');
       existingErrors.push(errorDetails);
-      // Keep only last 10 errors
       if (existingErrors.length > 10) {
         existingErrors.splice(0, existingErrors.length - 10);
       }
@@ -68,11 +55,9 @@ class ErrorBoundary extends Component<Props, State> {
       console.warn('Failed to store error in localStorage:', e);
     }
   };
-
   private handleReload = () => {
     window.location.reload();
   };
-
   private handleReset = () => {
     this.setState({
       hasError: false,
@@ -80,37 +65,29 @@ class ErrorBoundary extends Component<Props, State> {
       errorInfo: null,
     });
   };
-
   private copyErrorDetails = () => {
     if (!this.state.error || !this.state.errorInfo) return;
-
     const errorText = `
 Error: ${this.state.error.message}
-
 Stack Trace:
 ${this.state.error.stack}
-
 Component Stack:
 ${this.state.errorInfo.componentStack}
-
 Timestamp: ${new Date().toISOString()}
 URL: ${window.location.href}
 User Agent: ${navigator.userAgent}
     `.trim();
-
     navigator.clipboard.writeText(errorText).then(() => {
       alert('Error details copied to clipboard!');
     }).catch(() => {
       console.warn('Failed to copy to clipboard');
     });
   };
-
   public render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;
       }
-
       return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full p-8">
@@ -123,16 +100,13 @@ User Agent: ${navigator.userAgent}
                   </div>
                 </div>
               </div>
-              
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                 Something went wrong
               </h1>
-              
               <p className="text-gray-600 dark:text-gray-400 mb-6">
                 The application encountered an unexpected error. This has been logged for debugging.
               </p>
             </div>
-
             {this.state.error && (
               <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 mb-6">
                 <h3 className="text-sm font-semibold text-red-800 dark:text-red-200 mb-2">
@@ -143,7 +117,6 @@ User Agent: ${navigator.userAgent}
                 </p>
               </div>
             )}
-
             <div className="flex gap-3 justify-center">
               <button
                 onClick={this.handleReset}
@@ -152,14 +125,12 @@ User Agent: ${navigator.userAgent}
                 <RefreshCw className="w-4 h-4" />
                 <span>Try Again</span>
               </button>
-
               <button
                 onClick={this.handleReload}
                 className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
               >
                 Reload App
               </button>
-
               <button
                 onClick={this.copyErrorDetails}
                 className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center space-x-2"
@@ -168,7 +139,6 @@ User Agent: ${navigator.userAgent}
                 <span>Copy Error</span>
               </button>
             </div>
-
             <div className="mt-6 text-xs text-gray-500 dark:text-gray-400 text-center">
               <p>
                 If this problem persists, please check the browser console for more details.
@@ -178,9 +148,7 @@ User Agent: ${navigator.userAgent}
         </div>
       );
     }
-
     return this.props.children;
   }
 }
-
 export default ErrorBoundary;

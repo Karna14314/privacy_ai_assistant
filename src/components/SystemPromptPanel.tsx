@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { X, Save, Copy, Eye, EyeOff, RotateCcw, FileText } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { useSettingsStore } from '../stores/settingsStore';
-
 interface SystemPromptPanelProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
 const SystemPromptPanel: React.FC<SystemPromptPanelProps> = ({
   isOpen,
   onClose
@@ -16,22 +14,16 @@ const SystemPromptPanel: React.FC<SystemPromptPanelProps> = ({
   const [showPrompt, setShowPrompt] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-
   const { settings, updateSystemInstructions } = useSettingsStore();
-
-  // Initialize local state
   useEffect(() => {
     if (settings.systemInstructions.systemPrompt) {
       setLocalSystemPrompt(settings.systemInstructions.systemPrompt);
     }
   }, [settings.systemInstructions.systemPrompt]);
-
-  // Track changes
   useEffect(() => {
     const hasChanges = localSystemPrompt !== settings.systemInstructions.systemPrompt;
     setHasUnsavedChanges(hasChanges);
   }, [localSystemPrompt, settings.systemInstructions.systemPrompt]);
-
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -43,29 +35,23 @@ const SystemPromptPanel: React.FC<SystemPromptPanelProps> = ({
       setIsSaving(false);
     }
   };
-
   const handleReset = () => {
     setLocalSystemPrompt(settings.systemInstructions.systemPrompt);
     setHasUnsavedChanges(false);
   };
-
   const handleCopy = () => {
     navigator.clipboard.writeText(localSystemPrompt);
   };
-
   const defaultPrompt = `You are a helpful, privacy-focused AI assistant. You run locally to protect user privacy. 
 Be concise but informative, and always prioritize user privacy and security.`;
-
   const handleUseDefault = () => {
     setLocalSystemPrompt(defaultPrompt);
   };
-
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
             <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
@@ -87,11 +73,10 @@ Be concise but informative, and always prioritize user privacy and security.`;
             <X size={20} />
           </button>
         </div>
-
-        {/* Content */}
+        {}
         <div className="flex-1 overflow-y-auto p-6">
           <div className="space-y-6">
-            {/* System Prompt Editor */}
+            {}
             <div>
               <div className="flex items-center justify-between mb-3">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -130,8 +115,7 @@ Be concise but informative, and always prioritize user privacy and security.`;
                 This prompt defines how the AI assistant will behave and respond to your messages.
               </p>
             </div>
-
-            {/* Quick Actions */}
+            {}
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 Quick Actions
@@ -151,8 +135,7 @@ Be concise but informative, and always prioritize user privacy and security.`;
                 </button>
               </div>
             </div>
-
-            {/* Current Status */}
+            {}
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Status
@@ -179,8 +162,7 @@ Be concise but informative, and always prioritize user privacy and security.`;
             </div>
           </div>
         </div>
-
-        {/* Footer */}
+        {}
         <div className="flex items-center justify-between p-6 border-t border-gray-200 dark:border-gray-700">
           <button
             onClick={handleReset}
@@ -190,7 +172,6 @@ Be concise but informative, and always prioritize user privacy and security.`;
             <RotateCcw size={16} />
             <span>Reset</span>
           </button>
-          
           <div className="flex space-x-3">
             <button
               onClick={onClose}
@@ -212,5 +193,4 @@ Be concise but informative, and always prioritize user privacy and security.`;
     </div>
   );
 };
-
 export default SystemPromptPanel;

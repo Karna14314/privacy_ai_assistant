@@ -12,12 +12,10 @@ import {
 import { cn } from '../utils/cn';
 import { invoke } from '@tauri-apps/api/core';
 import { TAURI_ENV } from '../utils/tauriDetection';
-
 interface HardwareStatusProps {
   className?: string;
   showDetails?: boolean;
 }
-
 interface HardwareData {
   hardware: {
     cpu_cores: number;
@@ -36,12 +34,10 @@ interface HardwareData {
     recommended_models: string[];
   };
 }
-
 const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
   className,
   showDetails = false
 }) => {
-  // Initialize with fallback data to prevent "unavailable" messages
   const [hardwareData, setHardwareData] = useState<HardwareData | null>({
     hardware: {
       cpu_cores: 4,
@@ -61,9 +57,7 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(showDetails);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
   const loadHardwareInfo = async () => {
-    // Always start with a good fallback state
     const defaultHardwareData = {
       hardware: {
         cpu_cores: 4,
@@ -79,22 +73,16 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
         recommended_models: ['gemma3n:latest']
       }
     };
-
     try {
       setIsLoading(true);
-      // Never set error state - always use fallback
       setError(null);
-
-      console.log('🔧 Attempting hardware detection...');
-
-      // Try Tauri first (but don't fail if it doesn't work)
+      console.log(' Attempting hardware detection...');
       if (TAURI_ENV.isTauri && TAURI_ENV.hasInvoke) {
         try {
           const response = await Promise.race([
             invoke('get_hardware_info'),
             new Promise((_, reject) => setTimeout(() => reject(new Error('Tauri timeout')), 2000))
           ]) as any;
-
           if (response?.success && response?.data?.hardware && response?.data?.runtime) {
             setHardwareData(response.data);
             console.log('✅ Hardware data loaded via Tauri');
@@ -104,20 +92,15 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
           console.log('ℹ️ Tauri hardware detection not available, using fallback');
         }
       }
-
-      // Try HTTP fallback (but don't fail if it doesn't work)
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 2000);
-
         const response = await fetch('http://127.0.0.1:8000/hardware/info', {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           signal: controller.signal
         });
-
         clearTimeout(timeoutId);
-
         if (response.ok) {
           const data = await response.json();
           if (data?.success && data?.data?.hardware && data?.data?.runtime) {
@@ -129,39 +112,29 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
       } catch (httpError) {
         console.log('ℹ️ HTTP hardware detection not available, using fallback');
       }
-
-      // Always fall back to default data - never show errors
       console.log('ℹ️ Using default hardware configuration');
       setHardwareData(defaultHardwareData);
-
     } catch (err) {
-      // Even if everything fails, use fallback data
       console.log('ℹ️ Hardware detection failed, using default configuration');
       setHardwareData(defaultHardwareData);
     } finally {
       setIsLoading(false);
     }
   };
-
   const refreshHardware = async () => {
     try {
       setIsRefreshing(true);
-      console.log('🔄 Refreshing hardware detection...');
-
-      // If in Tauri environment, try to use the refresh command first
+      console.log(' Refreshing hardware detection...');
       if (TAURI_ENV.isTauri && TAURI_ENV.hasInvoke) {
         try {
-          console.log('🔄 Using Tauri refresh command...');
+          console.log(' Using Tauri refresh command...');
           await invoke('refresh_hardware_detection');
           console.log('✅ Tauri hardware refresh completed');
         } catch (refreshErr) {
           console.warn('⚠️ Tauri refresh failed, falling back to reload:', refreshErr);
         }
       }
-
-      // Reload the hardware info
       await loadHardwareInfo();
-
       console.log('✅ Hardware refresh completed');
     } catch (err) {
       console.error('❌ Failed to refresh hardware:', err);
@@ -170,11 +143,9 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
       setIsRefreshing(false);
     }
   };
-
   useEffect(() => {
     loadHardwareInfo();
   }, []);
-
   const getRuntimeModeIcon = (mode: string) => {
     switch (mode.toLowerCase()) {
       case 'gpu':
@@ -187,7 +158,6 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
         return <HardDrive className="text-gray-500" size={16} />;
     }
   };
-
   const getRuntimeModeColor = (mode: string) => {
     switch (mode.toLowerCase()) {
       case 'gpu':
@@ -200,14 +170,12 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
         return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-700';
     }
   };
-
   const formatMemory = (mb: number) => {
     if (mb >= 1024) {
       return `${(mb / 1024).toFixed(1)} GB`;
     }
     return `${mb} MB`;
   };
-
   if (isLoading) {
     return (
       <div className={cn('flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg', className)}>
@@ -216,16 +184,10 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
       </div>
     );
   }
-
-  // Always show hardware data - never show error states
-  // Component is guaranteed to have valid data due to initialization and fallback logic
-
-  // Hardware data is guaranteed to be valid due to initialization and fallback logic
   const { hardware, runtime } = hardwareData!;
-
   return (
     <div className={cn('bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm', className)}>
-      {/* Main Status Bar */}
+      {}
       <div 
         className={cn(
           'flex items-center justify-between px-3 py-2 cursor-pointer',
@@ -242,7 +204,6 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
             <CheckCircle size={14} className="text-green-500" />
           )}
         </div>
-        
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -259,11 +220,10 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
           {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </div>
       </div>
-
-      {/* Detailed Information */}
+      {}
       {isExpanded && (
         <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
-          {/* Runtime Information */}
+          {}
           <div>
             <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Runtime Configuration</h4>
             <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{runtime.reason}</p>
@@ -278,8 +238,7 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
               ))}
             </div>
           </div>
-
-          {/* Hardware Details */}
+          {}
           <div>
             <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Hardware Details</h4>
             <div className="grid grid-cols-2 gap-3 text-xs">
@@ -290,7 +249,6 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
                 </div>
                 <p className="text-gray-600 dark:text-gray-400">{hardware.cpu_cores} cores</p>
               </div>
-
               <div>
                 <div className="flex items-center gap-1 mb-1">
                   <HardDrive size={12} />
@@ -300,7 +258,6 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
                   {formatMemory(hardware.ram_available_mb)} / {formatMemory(hardware.ram_total_mb)}
                 </p>
               </div>
-
               {hardware.has_gpu && (
                 <div className="col-span-2">
                   <div className="flex items-center gap-1 mb-1">
@@ -317,8 +274,7 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
               )}
             </div>
           </div>
-
-          {/* Recommended Models */}
+          {}
           {runtime.recommended_models.length > 0 && (
             <div>
               <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Recommended Models</h4>
@@ -334,8 +290,7 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
               </div>
             </div>
           )}
-
-          {/* Platform Info */}
+          {}
           {hardware.platform && (
             <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
               <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -348,5 +303,4 @@ const HardwareStatusBadge: React.FC<HardwareStatusProps> = ({
     </div>
   );
 };
-
 export default HardwareStatusBadge;

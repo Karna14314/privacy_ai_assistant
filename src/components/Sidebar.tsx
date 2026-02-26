@@ -18,7 +18,6 @@ import {
 } from 'lucide-react';
 import { useAppStore, useMultiChatStore } from '../stores/chatStore';
 import { ChatSessionSummary } from '../types';
-
 interface ChatItemProps {
   session: ChatSessionSummary;
   isActive: boolean;
@@ -28,7 +27,6 @@ interface ChatItemProps {
   onDuplicate: (chatId: string) => void;
   onExport: (chatId: string) => void;
 }
-
 const ChatItem: React.FC<ChatItemProps> = ({
   session,
   isActive,
@@ -43,39 +41,33 @@ const ChatItem: React.FC<ChatItemProps> = ({
   const [showMenu, setShowMenu] = useState(false);
   const editInputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     if (isEditing && editInputRef.current) {
       editInputRef.current.focus();
       editInputRef.current.select();
     }
   }, [isEditing]);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setShowMenu(false);
       }
     };
-
     if (showMenu) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [showMenu]);
-
   const handleSaveEdit = () => {
     if (editTitle.trim() && editTitle !== session.title) {
       onRename(session.id, editTitle.trim());
     }
     setIsEditing(false);
   };
-
   const handleCancelEdit = () => {
     setEditTitle(session.title);
     setIsEditing(false);
   };
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSaveEdit();
@@ -83,22 +75,17 @@ const ChatItem: React.FC<ChatItemProps> = ({
       handleCancelEdit();
     }
   };
-
   const formatLastActivity = (date: Date | null | undefined) => {
     if (!date) {
       return 'No activity';
     }
-
-    // Ensure we have a valid Date object
     const activityDate = date instanceof Date ? date : new Date(date);
     if (isNaN(activityDate.getTime())) {
       return 'Invalid date';
     }
-
     const now = new Date();
     const diff = now.getTime() - activityDate.getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
     if (days === 0) {
       return 'Today';
     } else if (days === 1) {
@@ -109,7 +96,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
       return activityDate.toLocaleDateString();
     }
   };
-
   return (
     <div
       className={cn(
@@ -155,7 +141,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                   {session.title}
                 </h3>
               </div>
-              {/* Message Preview */}
+              {}
               {session.lastMessage && (
                 <p className="mt-1 text-xs text-gray-600 dark:text-gray-400 truncate">
                   {session.lastMessage.length > 50
@@ -163,7 +149,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
                     : session.lastMessage}
                 </p>
               )}
-
               <div className="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                 <div className="flex items-center space-x-2">
                   <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-xs">
@@ -175,7 +160,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
             </>
           )}
         </div>
-
         {!isEditing && (
           <div className="relative">
             <button
@@ -188,7 +172,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
             >
               <MoreHorizontal size={16} />
             </button>
-
             {showMenu && (
               <div
                 ref={menuRef}
@@ -250,7 +233,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
     </div>
   );
 };
-
 const Sidebar: React.FC = () => {
   const [showSidebar, setShowSidebar] = useState(true);
   const { preferences, setTheme } = useAppStore();
@@ -266,19 +248,14 @@ const Sidebar: React.FC = () => {
     loadChatSessions,
     isLoading
   } = useMultiChatStore();
-
   useEffect(() => {
-    // Load chat sessions on component mount
     loadChatSessions();
-  }, []); // Remove loadChatSessions from dependencies to prevent unnecessary re-renders
-
+  }, []);
   const toggleSidebar = () => setShowSidebar(!showSidebar);
-
   const handleThemeToggle = () => {
     const newTheme = preferences.theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
   };
-
   const handleNewChat = async () => {
     try {
       await createNewChat();
@@ -286,7 +263,6 @@ const Sidebar: React.FC = () => {
       console.error('Failed to create new chat:', error);
     }
   };
-
   const handleSelectChat = async (chatId: string) => {
     try {
       await switchToChat(chatId);
@@ -294,7 +270,6 @@ const Sidebar: React.FC = () => {
       console.error('Failed to switch to chat:', error);
     }
   };
-
   const handleRenameChat = async (chatId: string, newTitle: string) => {
     try {
       await renameChat(chatId, newTitle);
@@ -302,7 +277,6 @@ const Sidebar: React.FC = () => {
       console.error('Failed to rename chat:', error);
     }
   };
-
   const handleDeleteChat = async (chatId: string) => {
     if (window.confirm('Are you sure you want to delete this chat? This action cannot be undone.')) {
       try {
@@ -312,7 +286,6 @@ const Sidebar: React.FC = () => {
       }
     }
   };
-
   const handleDuplicateChat = async (chatId: string) => {
     try {
       await duplicateChat(chatId);
@@ -320,7 +293,6 @@ const Sidebar: React.FC = () => {
       console.error('Failed to duplicate chat:', error);
     }
   };
-
   const handleExportChat = async (chatId: string) => {
     try {
       const session = chatSessions[chatId];
@@ -328,7 +300,6 @@ const Sidebar: React.FC = () => {
         console.error('Chat session not found');
         return;
       }
-
       const exportData = {
         id: session.id,
         title: session.title,
@@ -339,11 +310,9 @@ const Sidebar: React.FC = () => {
         exportedAt: new Date().toISOString(),
         version: '1.0'
       };
-
       const dataStr = JSON.stringify(exportData, null, 2);
       const dataBlob = new Blob([dataStr], { type: 'application/json' });
       const url = URL.createObjectURL(dataBlob);
-
       const link = document.createElement('a');
       link.href = url;
       link.download = `chat-${session.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}-${new Date().toISOString().split('T')[0]}.json`;
@@ -351,13 +320,11 @@ const Sidebar: React.FC = () => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-
       console.log('Chat exported successfully');
     } catch (error) {
       console.error('Failed to export chat:', error);
     }
   };
-
   const handleImportChat = () => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -365,24 +332,14 @@ const Sidebar: React.FC = () => {
     input.onchange = async (event) => {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (!file) return;
-
       try {
         const text = await file.text();
         const importData = JSON.parse(text);
-
-        // Validate import data structure
         if (!importData.title || !importData.messages || !Array.isArray(importData.messages)) {
           throw new Error('Invalid chat file format');
         }
-
-        // Create new chat with imported data
         const newChatId = await createNewChat(`${importData.title} (Imported)`);
-
-        // Add messages to the new chat
-        // Note: This would need backend support for bulk message import
-        // For now, we'll just create the chat with the title
         console.log('Chat imported successfully:', newChatId);
-
       } catch (error) {
         console.error('Failed to import chat:', error);
         alert('Failed to import chat. Please check the file format.');
@@ -390,7 +347,6 @@ const Sidebar: React.FC = () => {
     };
     input.click();
   };
-
   return (
     <>
       <button
@@ -400,7 +356,6 @@ const Sidebar: React.FC = () => {
       >
         {showSidebar ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
       </button>
-
       <div
         className={cn(
           'fixed top-0 left-0 h-full w-80 transition-transform transform z-40',
@@ -408,7 +363,7 @@ const Sidebar: React.FC = () => {
         )}
       >
         <div className="h-full bg-white dark:bg-gray-900 shadow-lg flex flex-col border-r border-gray-200 dark:border-gray-700">
-          {/* Header */}
+          {}
           <div className="p-4 border-b border-gray-200 dark:border-gray-700 space-y-2">
             <button
               type="button"
@@ -428,8 +383,7 @@ const Sidebar: React.FC = () => {
               Import Chat
             </button>
           </div>
-
-          {/* Chat List */}
+          {}
           <div className="flex-1 overflow-y-auto p-2">
             {chatSummaries.length === 0 ? (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -454,8 +408,7 @@ const Sidebar: React.FC = () => {
               </div>
             )}
           </div>
-
-          {/* Footer */}
+          {}
           <div className="border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"
@@ -465,7 +418,6 @@ const Sidebar: React.FC = () => {
               <span>{preferences.theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}</span>
               <span className="text-sm">Toggle Dark Mode</span>
             </button>
-
             <div className="px-4 pb-4">
               <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                 <span>Privacy AI Assistant</span>
@@ -475,8 +427,7 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Overlay for mobile */}
+      {}
       {showSidebar && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
@@ -486,5 +437,4 @@ const Sidebar: React.FC = () => {
     </>
   );
 };
-
 export default Sidebar;

@@ -26,7 +26,6 @@ import {
 import { useAppStore } from '../stores/chatStore';
 import { EnhancedPluginManifest, PluginState } from '../types';
 import ToolDashboard from './ToolDashboard';
-
 interface PluginCardProps {
   pluginId: string;
   manifest: EnhancedPluginManifest;
@@ -36,7 +35,6 @@ interface PluginCardProps {
   onRemove: (pluginId: string) => void;
   onOpenDashboard: (pluginId: string) => void;
 }
-
 const PluginCard: React.FC<PluginCardProps> = ({
   pluginId,
   manifest,
@@ -47,7 +45,6 @@ const PluginCard: React.FC<PluginCardProps> = ({
   onOpenDashboard
 }) => {
   const [showDetails, setShowDetails] = useState(false);
-
   const getPluginIcon = (pluginId: string) => {
     const iconMap: Record<string, React.ComponentType<any>> = {
       todoList: CheckSquare,
@@ -60,9 +57,7 @@ const PluginCard: React.FC<PluginCardProps> = ({
     };
     return iconMap[pluginId] || Package;
   };
-
   const IconComponent = getPluginIcon(pluginId);
-
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
       <div className="flex items-start justify-between">
@@ -95,8 +90,7 @@ const PluginCard: React.FC<PluginCardProps> = ({
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               {manifest.description}
             </p>
-            
-            {/* Usage Stats */}
+            {}
             <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
               <span>Used {state.usageCount} times</span>
               {state.lastUsed && (
@@ -105,7 +99,6 @@ const PluginCard: React.FC<PluginCardProps> = ({
             </div>
           </div>
         </div>
-
         <div className="flex items-center space-x-2">
           <button
             type="button"
@@ -130,8 +123,7 @@ const PluginCard: React.FC<PluginCardProps> = ({
           </button>
         </div>
       </div>
-
-      {/* Expanded Details */}
+      {}
       {showDetails && (
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -148,14 +140,12 @@ const PluginCard: React.FC<PluginCardProps> = ({
                 ))}
               </div>
             </div>
-            
             <div>
               <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Category</h4>
               <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-xs capitalize">
                 {manifest.category}
               </span>
             </div>
-
             {manifest.examples && manifest.examples.length > 0 && (
               <div className="md:col-span-2">
                 <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Examples</h4>
@@ -169,7 +159,6 @@ const PluginCard: React.FC<PluginCardProps> = ({
               </div>
             )}
           </div>
-
           <div className="flex items-center justify-end space-x-2 mt-4">
             <button
               type="button"
@@ -202,12 +191,10 @@ const PluginCard: React.FC<PluginCardProps> = ({
     </div>
   );
 };
-
 interface EnhancedPluginPanelProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
 const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
   isOpen,
   onClose
@@ -218,10 +205,7 @@ const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
   const [plugins, setPlugins] = useState<Record<string, { manifest: EnhancedPluginManifest; state: PluginState }>>({});
   const [showToolDashboard, setShowToolDashboard] = useState(false);
   const [selectedTool, setSelectedTool] = useState<{ id: string; manifest: EnhancedPluginManifest } | null>(null);
-
   const { pluginsEnabled, setPluginsEnabled } = useAppStore();
-
-  // Mock plugin data - in real implementation, this would come from the plugin system
   useEffect(() => {
     const mockPlugins = {
       todoList: {
@@ -315,10 +299,8 @@ const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
         }
       }
     };
-    
     setPlugins(mockPlugins);
   }, []);
-
   const handleTogglePlugin = (pluginId: string, enabled: boolean) => {
     setPlugins(prev => ({
       ...prev,
@@ -331,12 +313,9 @@ const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
       }
     }));
   };
-
   const handleConfigurePlugin = (pluginId: string) => {
     console.log('Configure plugin:', pluginId);
-    // Implementation for plugin configuration
   };
-
   const handleOpenDashboard = (pluginId: string) => {
     const plugin = plugins[pluginId];
     if (plugin && plugin.state.enabled) {
@@ -345,7 +324,6 @@ const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
       console.log('Opening dashboard for plugin:', pluginId);
     }
   };
-
   const handleRemovePlugin = (pluginId: string) => {
     if (window.confirm(`Are you sure you want to remove the ${plugins[pluginId].manifest.name} plugin?`)) {
       setPlugins(prev => {
@@ -354,41 +332,30 @@ const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
       });
     }
   };
-
   const handleRefreshPlugins = () => {
     console.log('Refreshing plugins...');
-    // Implementation for refreshing plugin list
   };
-
   const handleInstallPlugin = () => {
     console.log('Install new plugin...');
-    // Implementation for plugin installation
   };
-
-  // Filter plugins
   const filteredPlugins = Object.entries(plugins).filter(([pluginId, { manifest, state }]) => {
     const matchesSearch = searchQuery === '' || 
       manifest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       manifest.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       manifest.keywords.some(keyword => keyword.toLowerCase().includes(searchQuery.toLowerCase()));
-    
     const matchesCategory = categoryFilter === 'all' || manifest.category === categoryFilter;
     const matchesStatus = statusFilter === 'all' || 
       (statusFilter === 'enabled' && state.enabled) ||
       (statusFilter === 'disabled' && !state.enabled);
-    
     return matchesSearch && matchesCategory && matchesStatus;
   });
-
   const categories = ['all', 'productivity', 'utility', 'system', 'file', 'other'];
   const statuses = ['all', 'enabled', 'disabled'];
-
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-hidden">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
             <Package className="text-blue-600 dark:text-blue-400" size={24} />
@@ -424,11 +391,10 @@ const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
             </button>
           </div>
         </div>
-
-        {/* Controls */}
+        {}
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex flex-col sm:flex-row gap-4">
-            {/* Search */}
+            {}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
@@ -439,8 +405,7 @@ const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-
-            {/* Filters */}
+            {}
             <div className="flex space-x-2">
               <select
                 value={categoryFilter}
@@ -453,7 +418,6 @@ const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
                   </option>
                 ))}
               </select>
-
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -466,8 +430,7 @@ const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
                 ))}
               </select>
             </div>
-
-            {/* Action Buttons */}
+            {}
             <div className="flex space-x-2">
               <button
                 type="button"
@@ -488,8 +451,7 @@ const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
             </div>
           </div>
         </div>
-
-        {/* Plugin List */}
+        {}
         <div className="flex-1 overflow-y-auto p-6">
           {filteredPlugins.length === 0 ? (
             <div className="text-center py-12">
@@ -520,8 +482,7 @@ const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
             </div>
           )}
         </div>
-
-        {/* Footer */}
+        {}
         <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
           <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
             <span>
@@ -533,8 +494,7 @@ const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Tool Dashboard Modal */}
+      {}
       {showToolDashboard && selectedTool && (
         <ToolDashboard
           toolName={selectedTool.manifest.name}
@@ -557,7 +517,6 @@ const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
             setSelectedTool(null);
           }}
           onExecute={async (data) => {
-            // Store tool context for LLM integration
             const toolContext = {
               toolName: selectedTool.manifest.name,
               toolId: selectedTool.id,
@@ -565,10 +524,7 @@ const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
               context: data.context,
               timestamp: new Date().toISOString()
             };
-
-            // Save to localStorage for LLM integration
             localStorage.setItem('toolContext', JSON.stringify(toolContext));
-
             console.log('Tool executed with context:', toolContext);
             return { success: true, message: 'Tool context saved for LLM integration' };
           }}
@@ -577,5 +533,4 @@ const EnhancedPluginPanel: React.FC<EnhancedPluginPanelProps> = ({
     </div>
   );
 };
-
 export default EnhancedPluginPanel;

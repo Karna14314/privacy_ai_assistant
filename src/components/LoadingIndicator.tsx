@@ -1,5 +1,4 @@
 import React from 'react';
-
 const LoadingIndicator: React.FC = () => {
   return (
     <div className="flex justify-start mb-4">
@@ -16,5 +15,4 @@ const LoadingIndicator: React.FC = () => {
     </div>
   );
 };
-
 export default LoadingIndicator;

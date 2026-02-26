@@ -1,6 +1,4 @@
 import { core } from '@tauri-apps/api';
-
-// Extend Window interface to include Tauri properties
 declare global {
   interface Window {
     __TAURI__?: any;
@@ -8,35 +6,18 @@ declare global {
     __TAURI_INVOKE__?: any;
   }
 }
-
-/**
- * Represents the detected capabilities of the application environment.
- */
 export interface EnvironmentCapabilities {
-  isTauri: boolean; // True if running in a Tauri desktop environment
-  isBrowser: boolean; // True if running in a standard web browser
-  hasInvoke: boolean; // True if the Tauri `invoke` API is available
+  isTauri: boolean;
+  isBrowser: boolean;
+  hasInvoke: boolean;
 }
-
-// A promise that resolves with the environment capabilities once detection is complete.
 let environmentPromise: Promise<EnvironmentCapabilities> | null = null;
-
-/**
- * Asynchronously detects the environment (Tauri or Browser) with a timeout.
- * This function waits for the `__TAURI__` object to be available on the `window` object.
- *
- * @param {number} timeout - The maximum time to wait for the Tauri environment in milliseconds.
- * @returns {Promise<EnvironmentCapabilities>} A promise that resolves to the environment capabilities.
- */
 async function detectEnvironment(timeout = 2000): Promise<EnvironmentCapabilities> {
-  // Check if running in a non-browser context (e.g., server-side rendering)
   if (typeof window === 'undefined') {
     return { isTauri: false, isBrowser: false, hasInvoke: false };
   }
-
   return new Promise((resolve) => {
     const startTime = Date.now();
-
     const checkTauri = () => {
       if (window.__TAURI__) {
         console.log(`✅ Tauri environment detected after ${Date.now() - startTime}ms.`);
@@ -49,99 +30,50 @@ async function detectEnvironment(timeout = 2000): Promise<EnvironmentCapabilitie
         console.warn(`⚠️ Timed out waiting for Tauri environment. Assuming browser mode.`);
         resolve({ isTauri: false, isBrowser: true, hasInvoke: false });
       } else {
-        setTimeout(checkTauri, 50); // Retry after a short delay
+        setTimeout(checkTauri, 50);
       }
     };
-
     checkTauri();
   });
 }
-
-/**
- * Ensures that the environment is detected, reusing the result if already available.
- * This function should be called by any part of the app that needs to know the environment.
- *
- * @returns {Promise<EnvironmentCapabilities>} A promise that resolves to the environment capabilities.
- */
 export function ensureEnvironment(): Promise<EnvironmentCapabilities> {
   if (!environmentPromise) {
     environmentPromise = detectEnvironment();
   }
   return environmentPromise;
 }
-
-/**
- * A simple hook to get the environment capabilities.
- * It is recommended to use this in components that need to adapt to the environment.
- *
- * Example:
- * ```
- * const { isTauri, isBrowser } = useEnvironment();
- * if (isTauri) {
- *   // Render Tauri-specific components
- * }
- * ```
- */
 export const useEnvironment = (): EnvironmentCapabilities => {
   const [env, setEnv] = React.useState<EnvironmentCapabilities>({
     isTauri: false,
     isBrowser: true,
     hasInvoke: false,
   });
-
   React.useEffect(() => {
     ensureEnvironment().then(setEnv);
   }, []);
-
   return env;
 };
-
-// Import React dynamically for the hook
 let React: typeof import('react');
 try {
   React = require('react');
 } catch (e) {
-  // React is not available, hook will not be used
 }
-
-/**
- * Synchronous environment detection for immediate use.
- * This provides a best-effort detection without waiting for async initialization.
- * For more reliable detection, use ensureEnvironment() or useEnvironment().
- */
 export const TAURI_ENV: EnvironmentCapabilities = (() => {
-  // Check if running in a non-browser context
   if (typeof window === 'undefined') {
     return { isTauri: false, isBrowser: false, hasInvoke: false };
   }
-
-  // Basic synchronous checks
   const hasTauriGlobal = !!window.__TAURI__;
   const isTauriProtocol = window.location.protocol === 'tauri:';
   const hasTauriUserAgent = navigator.userAgent.includes('Tauri') || navigator.userAgent.includes('wry');
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  const isDevPort = window.location.port === '5174' || window.location.port === '5173'; // Vite dev server port
-
-  // Check for Tauri-specific window properties that indicate we're in the desktop app
+  const isDevPort = window.location.port === '5174' || window.location.port === '5173';
   const hasTauriWindow = !!(window as any).__TAURI_INTERNALS__;
   const hasTauriAPI = !!(window as any).__TAURI_INVOKE__;
-
-  // Enhanced detection for development environment
-  // In Tauri dev mode, we're running on localhost:5173 but with Tauri APIs available
   const isDevelopmentTauri = isLocalhost && isDevPort && (hasTauriGlobal || hasTauriUserAgent || hasTauriWindow || hasTauriAPI);
-
-  // More aggressive detection - if we're on localhost with dev port, assume Tauri dev mode
-  // This is because the user is explicitly running tauri:dev
   const isLikelyTauriDev = isLocalhost && isDevPort;
-
-  // For development, be very permissive - if we're on localhost dev port, assume Tauri
-  // This prevents the browser mode blocker from appearing during development
   const isDevelopmentMode = isLocalhost && (isDevPort || window.location.port === '5174');
-
-  // Determine if we're likely in Tauri
   const isTauri = hasTauriGlobal || isTauriProtocol || isDevelopmentTauri || isLikelyTauriDev || isDevelopmentMode;
-
-  console.log('🔍 Tauri Detection:', {
+  console.log(' Tauri Detection:', {
     hasTauriGlobal,
     isTauriProtocol,
     hasTauriUserAgent,
@@ -155,45 +87,29 @@ export const TAURI_ENV: EnvironmentCapabilities = (() => {
     userAgent: navigator.userAgent,
     location: window.location.href,
   });
-
-  // For development mode, be more permissive with hasInvoke
-  // If we detect Tauri environment, assume invoke will be available
   const hasInvoke = isTauri && (
     (hasTauriGlobal && typeof core.invoke === 'function') ||
-    isDevelopmentMode // In dev mode, assume invoke will be available
+    isDevelopmentMode
   );
-
   return {
     isTauri,
     isBrowser: !isTauri,
     hasInvoke,
   };
 })();
-
-/**
- * Interface for Tauri connection status
- */
 export interface TauriStatus {
   status: 'connected' | 'disconnected' | 'checking';
   message?: string;
   capabilities?: EnvironmentCapabilities;
   recommendations?: string[];
 }
-
-/**
- * Get the current Tauri connection status synchronously
- */
 export function getTauriStatus(): TauriStatus {
   const capabilities = TAURI_ENV;
-
-  // Check if we're in development mode (localhost with dev port)
   const isLocalhost = typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
   const isDevPort = typeof window !== 'undefined' &&
     (window.location.port === '5174' || window.location.port === '5173');
   const isDevelopmentMode = isLocalhost && isDevPort;
-
-  // In development mode, be more permissive
   if (isDevelopmentMode && capabilities.isTauri) {
     return {
       status: 'connected',
@@ -202,7 +118,6 @@ export function getTauriStatus(): TauriStatus {
       recommendations: [],
     };
   }
-
   if (capabilities.isTauri && capabilities.hasInvoke) {
     return {
       status: 'connected',
@@ -212,7 +127,7 @@ export function getTauriStatus(): TauriStatus {
     };
   } else if (capabilities.isTauri && !capabilities.hasInvoke) {
     return {
-      status: 'connected', // Changed from 'checking' to 'connected' for dev mode
+      status: 'connected',
       message: 'Tauri detected - initializing APIs',
       capabilities,
       recommendations: [],

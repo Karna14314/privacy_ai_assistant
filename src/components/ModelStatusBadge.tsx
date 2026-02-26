@@ -2,14 +2,12 @@ import React, { useState } from 'react';
 import { AlertCircle, CheckCircle, Loader2, RefreshCw } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { ModelHealthStatus, modelHealthChecker } from '../utils/modelHealth';
-
 interface ModelStatusBadgeProps {
   status: ModelHealthStatus;
   className?: string;
   showDetails?: boolean;
   onRefresh?: () => void;
 }
-
 export const ModelStatusBadge: React.FC<ModelStatusBadgeProps> = ({
   status,
   className = '',
@@ -50,11 +48,9 @@ export const ModelStatusBadge: React.FC<ModelStatusBadgeProps> = ({
         };
     }
   };
-
   const config = getStatusConfig();
   const Icon = config.icon;
   const detailedStatus = modelHealthChecker.getDetailedStatus();
-
   const handleRefresh = () => {
     if (onRefresh) {
       onRefresh();
@@ -62,7 +58,6 @@ export const ModelStatusBadge: React.FC<ModelStatusBadgeProps> = ({
       modelHealthChecker.forceCheck();
     }
   };
-
   return (
     <div className="relative">
       <div
@@ -78,13 +73,11 @@ export const ModelStatusBadge: React.FC<ModelStatusBadgeProps> = ({
       >
         <Icon className={cn('w-3 h-3 mr-1.5', config.animate)} />
         {config.label}
-
-        {/* Refresh icon */}
+        {}
         <RefreshCw className={cn(
           'w-3 h-3 ml-1.5 opacity-50 hover:opacity-100 transition-opacity',
           status.isChecking && 'animate-spin'
         )} />
-
         {status.lastChecked && showDetails && (
           <span className="ml-1 opacity-75">
             • {new Date(status.lastChecked).toLocaleTimeString('en-US', {
@@ -95,8 +88,7 @@ export const ModelStatusBadge: React.FC<ModelStatusBadgeProps> = ({
           </span>
         )}
       </div>
-
-      {/* Tooltip */}
+      {}
       {showTooltip && (
         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded-lg shadow-lg z-50 min-w-64">
           <div className="font-medium mb-1">{detailedStatus.statusText}</div>
@@ -113,12 +105,11 @@ export const ModelStatusBadge: React.FC<ModelStatusBadgeProps> = ({
               Last successful: {new Date(status.lastSuccessfulCheck).toLocaleString()}
             </div>
           )}
-          {/* Arrow */}
+          {}
           <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-100"></div>
         </div>
       )}
     </div>
   );
 };
-
 export default ModelStatusBadge;

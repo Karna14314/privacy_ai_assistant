@@ -16,12 +16,10 @@ import {
 } from 'lucide-react';
 import { useSettingsStore } from '../stores/settingsStore';
 import { SystemInstructions } from '../types';
-
 interface SystemSettingsPanelProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
 const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
   isOpen,
   onClose
@@ -30,7 +28,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showSystemPrompt, setShowSystemPrompt] = useState(false);
   const [localSettings, setLocalSettings] = useState<SystemInstructions | null>(null);
-
   const {
     settings,
     updateSystemInstructions,
@@ -43,36 +40,29 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
     isLoading,
     error
   } = useSettingsStore();
-
-  // Initialize local settings
   useEffect(() => {
     if (settings.systemInstructions) {
       setLocalSettings({ ...settings.systemInstructions });
     }
   }, [settings.systemInstructions]);
-
-  // Track changes
   useEffect(() => {
     if (localSettings && settings.systemInstructions) {
       const hasChanges = JSON.stringify(localSettings) !== JSON.stringify(settings.systemInstructions);
       setHasUnsavedChanges(hasChanges);
     }
   }, [localSettings, settings.systemInstructions]);
-
   const handleSaveSettings = async () => {
     if (localSettings) {
       updateSystemInstructions(localSettings);
       setHasUnsavedChanges(false);
     }
   };
-
   const handleResetToDefaults = () => {
     if (window.confirm('Are you sure you want to reset all settings to defaults? This cannot be undone.')) {
       resetToDefaults();
       setHasUnsavedChanges(false);
     }
   };
-
   const handleExportSettings = () => {
     try {
       const settingsJson = exportSettings();
@@ -89,7 +79,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
       console.error('Failed to export settings:', error);
     }
   };
-
   const handleImportSettings = () => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -97,7 +86,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
     input.onchange = async (event) => {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (!file) return;
-
       try {
         const text = await file.text();
         await importSettings(text);
@@ -109,13 +97,11 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
     };
     input.click();
   };
-
   const handleCopySystemPrompt = () => {
     if (localSettings?.systemPrompt) {
       navigator.clipboard.writeText(localSettings.systemPrompt);
     }
   };
-
   const tabs = [
     { id: 'system', label: 'System Instructions', icon: Settings },
     { id: 'behavior', label: 'Behavior', icon: Info },
@@ -124,13 +110,11 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
     { id: 'streaming', label: 'Streaming', icon: Settings },
     { id: 'ui', label: 'Interface', icon: Settings }
   ];
-
   if (!isOpen || !localSettings) return null;
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-6xl mx-4 max-h-[90vh] overflow-hidden">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
             <Settings className="text-blue-600 dark:text-blue-400" size={24} />
@@ -169,9 +153,8 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
             </button>
           </div>
         </div>
-
         <div className="flex h-[calc(90vh-120px)]">
-          {/* Sidebar */}
+          {}
           <div className="w-64 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 p-4">
             <nav className="space-y-2">
               {tabs.map((tab) => {
@@ -195,8 +178,7 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
               })}
             </nav>
           </div>
-
-          {/* Content */}
+          {}
           <div className="flex-1 overflow-y-auto p-6">
             {activeTab === 'system' && (
               <div className="space-y-6">
@@ -237,7 +219,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                     This prompt will be sent to the AI model before every conversation to establish its behavior and personality.
                   </p>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Prompt Template
@@ -254,7 +235,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                 </div>
               </div>
             )}
-
             {activeTab === 'behavior' && (
               <div className="space-y-6">
                 <div>
@@ -277,7 +257,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                     <option value="conversational">Conversational</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Creativity Level: {Math.round(localSettings.behaviorSettings.creativityLevel * 100)}%
@@ -302,7 +281,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                     <span>Creative</span>
                   </div>
                 </div>
-
                 <div className="space-y-3">
                   <div className="flex items-center">
                     <input
@@ -322,7 +300,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                       Use emojis in responses
                     </label>
                   </div>
-
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -344,7 +321,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                 </div>
               </div>
             )}
-
             {activeTab === 'context' && (
               <div className="space-y-6">
                 <div>
@@ -370,7 +346,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                     Maximum number of tokens to include in context window.
                   </p>
                 </div>
-
                 <div className="space-y-3">
                   <div className="flex items-center">
                     <input
@@ -390,7 +365,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                       Include system information in context
                     </label>
                   </div>
-
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -412,8 +386,7 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                 </div>
               </div>
             )}
-
-            {/* Voice Settings Tab */}
+            {}
             {activeTab === 'voice' && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -430,7 +403,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                         Enable Speech-to-Text
                       </label>
                     </div>
-
                     <div className="flex items-center">
                       <input
                         type="checkbox"
@@ -443,7 +415,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                         Enable Text-to-Speech
                       </label>
                     </div>
-
                     <div className="flex items-center">
                       <input
                         type="checkbox"
@@ -457,7 +428,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                       </label>
                     </div>
                   </div>
-
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -473,7 +443,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                         <option value="whisper">Whisper (Tauri)</option>
                       </select>
                     </div>
-
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         STT Language
@@ -494,8 +463,7 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                 </div>
               </div>
             )}
-
-            {/* Streaming Settings Tab */}
+            {}
             {activeTab === 'streaming' && (
               <div className="space-y-6">
                 <div className="flex items-center">
@@ -510,7 +478,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                     Enable streaming responses
                   </label>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Chunk Size: {settings.streamingConfig.chunkSize} words
@@ -524,7 +491,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                     className="w-full"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Delay: {settings.streamingConfig.delayMs}ms
@@ -539,7 +505,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                     className="w-full"
                   />
                 </div>
-
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -554,8 +519,7 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                 </div>
               </div>
             )}
-
-            {/* UI Settings Tab */}
+            {}
             {activeTab === 'ui' && (
               <div className="space-y-6">
                 <div className="space-y-3">
@@ -571,7 +535,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                       Show plugin sidebar
                     </label>
                   </div>
-
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -584,7 +547,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
                       Show system status indicators
                     </label>
                   </div>
-
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -602,8 +564,7 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
             )}
           </div>
         </div>
-
-        {/* Footer */}
+        {}
         <div className="flex items-center justify-between p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
           <div className="flex items-center space-x-2">
             {error && (
@@ -619,7 +580,6 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
               </div>
             )}
           </div>
-          
           <div className="flex items-center space-x-3">
             <button
               type="button"
@@ -656,5 +616,4 @@ const SystemSettingsPanel: React.FC<SystemSettingsPanelProps> = ({
     </div>
   );
 };
-
 export default SystemSettingsPanel;

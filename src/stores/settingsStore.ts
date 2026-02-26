@@ -2,13 +2,10 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Store } from '@tauri-apps/plugin-store';
 import { AppSettings, SystemInstructions, VoiceConfig, StreamingConfig } from '../types';
-
-// Default configurations
 const defaultSystemInstructions: SystemInstructions = {
   systemPrompt: `You are a helpful, privacy-focused AI assistant. You run locally to protect user privacy. 
 Be concise but informative, and always prioritize user privacy and security.`,
   promptTemplate: `{system_prompt}
-
 User: {user_message}
 Assistant:`,
   behaviorSettings: {
@@ -23,7 +20,6 @@ Assistant:`,
     includeChatHistory: true,
   },
 };
-
 const defaultVoiceConfig: VoiceConfig = {
   sttEnabled: true,
   ttsEnabled: true,
@@ -31,14 +27,12 @@ const defaultVoiceConfig: VoiceConfig = {
   sttLanguage: 'en-US',
   autoPlayTTS: false,
 };
-
 const defaultStreamingConfig: StreamingConfig = {
   enabled: true,
   chunkSize: 50,
   delayMs: 50,
   autoScroll: true,
 };
-
 const defaultAppSettings: AppSettings = {
   systemInstructions: defaultSystemInstructions,
   voiceConfig: defaultVoiceConfig,
@@ -49,13 +43,11 @@ const defaultAppSettings: AppSettings = {
     compactMode: false,
   },
 };
-
 interface SettingsState {
   settings: AppSettings;
   isLoading: boolean;
   error: string | null;
 }
-
 interface SettingsActions {
   updateSystemInstructions: (instructions: Partial<SystemInstructions>) => void;
   updateVoiceConfig: (config: Partial<VoiceConfig>) => void;
@@ -67,30 +59,24 @@ interface SettingsActions {
   exportSettings: () => string;
   importSettings: (settingsJson: string) => Promise<void>;
 }
-
 interface SettingsStore extends SettingsState, SettingsActions {}
-
-// Tauri store instance
 let tauriStore: Store | null = null;
-
 const initTauriStore = async () => {
   if (!tauriStore) {
     try {
-      tauriStore = new Store('settings.json');
+      tauriStore = await Store.load('settings.json');
     } catch (error) {
       console.warn('Failed to initialize Tauri store, using localStorage fallback:', error);
     }
   }
   return tauriStore;
 };
-
 export const useSettingsStore = create<SettingsStore>()(
   persist(
     (set, get) => ({
       settings: defaultAppSettings,
       isLoading: false,
       error: null,
-
       updateSystemInstructions: (instructions: Partial<SystemInstructions>) => {
         set((state) => ({
           settings: {
@@ -103,7 +89,6 @@ export const useSettingsStore = create<SettingsStore>()(
         }));
         get().saveSettings();
       },
-
       updateVoiceConfig: (config: Partial<VoiceConfig>) => {
         set((state) => ({
           settings: {
@@ -116,7 +101,6 @@ export const useSettingsStore = create<SettingsStore>()(
         }));
         get().saveSettings();
       },
-
       updateStreamingConfig: (config: Partial<StreamingConfig>) => {
         set((state) => ({
           settings: {
@@ -129,7 +113,6 @@ export const useSettingsStore = create<SettingsStore>()(
         }));
         get().saveSettings();
       },
-
       updateUIPreferences: (preferences: Partial<AppSettings['uiPreferences']>) => {
         set((state) => ({
           settings: {
@@ -142,12 +125,10 @@ export const useSettingsStore = create<SettingsStore>()(
         }));
         get().saveSettings();
       },
-
       resetToDefaults: () => {
         set({ settings: defaultAppSettings });
         get().saveSettings();
       },
-
       loadSettings: async () => {
         set({ isLoading: true, error: null });
         try {
@@ -165,7 +146,6 @@ export const useSettingsStore = create<SettingsStore>()(
           set({ isLoading: false });
         }
       },
-
       saveSettings: async () => {
         try {
           const store = await initTauriStore();
@@ -178,11 +158,9 @@ export const useSettingsStore = create<SettingsStore>()(
           set({ error: `Failed to save settings: ${error}` });
         }
       },
-
       exportSettings: () => {
         return JSON.stringify(get().settings, null, 2);
       },
-
       importSettings: async (settingsJson: string) => {
         try {
           const importedSettings = JSON.parse(settingsJson) as AppSettings;

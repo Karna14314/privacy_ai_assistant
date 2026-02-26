@@ -20,22 +20,19 @@ import { cn } from '../utils/cn';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { toolMetricsService, ToolMetricsData } from '../services/toolMetricsService';
-
 interface CapabilitiesStatusPanelProps {
   className?: string;
   isCollapsed?: boolean;
   onToggle?: () => void;
 }
-
 interface CapabilityStatus {
   name: string;
   status: 'connected' | 'disconnected' | 'active' | 'inactive' | 'ready' | 'listening' | 'processing' | 'speaking';
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: any;
   details?: string;
   lastUpdate?: Date;
   color: string;
 }
-
 export const CapabilitiesStatusPanel: React.FC<CapabilitiesStatusPanelProps> = ({
   className,
   isCollapsed = false,
@@ -45,8 +42,6 @@ export const CapabilitiesStatusPanel: React.FC<CapabilitiesStatusPanelProps> = (
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [toolMetrics, setToolMetrics] = useState<Map<string, ToolMetricsData>>(new Map());
-
-  // Initialize capabilities
   const initializeCapabilities = async () => {
     const initialCapabilities: CapabilityStatus[] = [
       {
@@ -85,31 +80,17 @@ export const CapabilitiesStatusPanel: React.FC<CapabilitiesStatusPanelProps> = (
         color: 'text-green-500'
       }
     ];
-
     setCapabilities(initialCapabilities);
     await updateCapabilities();
   };
-
-  // Update capabilities status
   const updateCapabilities = async () => {
     setIsRefreshing(true);
-    
     try {
-      // Check dashboard access
       const dashboardStatus = await checkDashboardAccess();
-      
-      // Check model status
       const modelStatus = await checkModelStatus();
-      
-      // Check browser integration
       const browserStatus = await checkBrowserIntegration();
-      
-      // Check context usage
       const contextStatus = await checkContextUsage();
-      
-      // Check voice chat
       const voiceStatus = await checkVoiceChat();
-
       setCapabilities([
         {
           name: 'Dashboard Access',
@@ -152,7 +133,6 @@ export const CapabilitiesStatusPanel: React.FC<CapabilitiesStatusPanelProps> = (
           color: voiceStatus.color
         }
       ]);
-
       setLastRefresh(new Date());
     } catch (error) {
       console.error('Failed to update capabilities:', error);
@@ -160,8 +140,6 @@ export const CapabilitiesStatusPanel: React.FC<CapabilitiesStatusPanelProps> = (
       setIsRefreshing(false);
     }
   };
-
-  // Check individual capabilities
   const checkDashboardAccess = async () => {
     try {
       await invoke('get_hardware_metrics');
@@ -170,7 +148,6 @@ export const CapabilitiesStatusPanel: React.FC<CapabilitiesStatusPanelProps> = (
       return { connected: false, details: 'Dashboard unavailable' };
     }
   };
-
   const checkModelStatus = async () => {
     try {
       const status = await invoke('check_llm_health');
@@ -185,47 +162,35 @@ export const CapabilitiesStatusPanel: React.FC<CapabilitiesStatusPanelProps> = (
       };
     }
   };
-
   const checkBrowserIntegration = async () => {
-    // Check if browser is currently active
     const browserActive = document.querySelector('[data-browser-active]') !== null;
     return {
       active: browserActive,
       details: browserActive ? 'Browser panel active' : 'Browser ready'
     };
   };
-
   const checkContextUsage = async () => {
-    // Get context usage from localStorage or store
     const tokenCount = parseInt(localStorage.getItem('tokenCount') || '0');
     const maxTokens = 32768;
     const percentage = (tokenCount / maxTokens) * 100;
-    
     let color = 'text-green-500';
     if (percentage >= 90) color = 'text-red-500';
     else if (percentage >= 70) color = 'text-yellow-500';
-    
     return {
       details: `${tokenCount.toLocaleString()} / ${maxTokens.toLocaleString()} tokens (${Math.round(percentage)}%)`,
       color
     };
   };
-
   const checkVoiceChat = async () => {
-    // Check voice chat status from localStorage or store
     const voiceStatus = localStorage.getItem('voiceStatus') || 'ready';
-    
     const statusMap = {
       ready: { status: 'ready' as const, details: 'Ready for voice input', color: 'text-green-500' },
       listening: { status: 'listening' as const, details: 'Listening...', color: 'text-blue-500' },
       processing: { status: 'processing' as const, details: 'Processing speech...', color: 'text-yellow-500' },
       speaking: { status: 'speaking' as const, details: 'Speaking response...', color: 'text-purple-500' }
     };
-    
     return statusMap[voiceStatus as keyof typeof statusMap] || statusMap.ready;
   };
-
-  // Get status icon
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'connected':
@@ -245,20 +210,12 @@ export const CapabilitiesStatusPanel: React.FC<CapabilitiesStatusPanelProps> = (
         return <div className="w-3 h-3 bg-gray-400 rounded-full" />;
     }
   };
-
-  // Initialize on mount
   useEffect(() => {
     initializeCapabilities();
-
-    // Set up real-time updates every 2 seconds
     const interval = setInterval(updateCapabilities, 2000);
-
-    // Subscribe to tool metrics updates
     const unsubscribeMetrics = toolMetricsService.subscribe((metrics) => {
       setToolMetrics(metrics);
     });
-
-    // Listen for Tauri events
     const setupEventListeners = async () => {
       try {
         await listen('capability-status-update', (event: any) => {
@@ -269,18 +226,15 @@ export const CapabilitiesStatusPanel: React.FC<CapabilitiesStatusPanelProps> = (
         console.warn('Failed to setup event listeners:', error);
       }
     };
-
     setupEventListeners();
-
     return () => {
       clearInterval(interval);
       unsubscribeMetrics();
     };
   }, []);
-
   return (
     <div className={cn('bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg', className)}>
-      {/* Header */}
+      {}
       <div 
         className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
         onClick={onToggle}
@@ -291,7 +245,6 @@ export const CapabilitiesStatusPanel: React.FC<CapabilitiesStatusPanelProps> = (
             System Capabilities
           </span>
         </div>
-        
         <div className="flex items-center gap-2">
           <button
             onClick={(e) => {
@@ -304,21 +257,18 @@ export const CapabilitiesStatusPanel: React.FC<CapabilitiesStatusPanelProps> = (
           >
             <RefreshCw size={12} className={isRefreshing ? 'animate-spin' : ''} />
           </button>
-          
           {onToggle && (
             isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />
           )}
         </div>
       </div>
-
-      {/* Content */}
+      {}
       {!isCollapsed && (
         <div className="border-t border-gray-200 dark:border-gray-700">
-          {/* Capabilities List */}
+          {}
           <div className="p-3 space-y-3">
             {capabilities.map((capability, index) => {
               const IconComponent = capability.icon;
-              
               return (
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -326,7 +276,6 @@ export const CapabilitiesStatusPanel: React.FC<CapabilitiesStatusPanelProps> = (
                       <IconComponent size={16} className={capability.color} />
                       {getStatusIcon(capability.status)}
                     </div>
-                    
                     <div>
                       <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                         {capability.name}
@@ -336,7 +285,6 @@ export const CapabilitiesStatusPanel: React.FC<CapabilitiesStatusPanelProps> = (
                       </div>
                     </div>
                   </div>
-                  
                   {capability.lastUpdate && (
                     <div className="text-xs text-gray-500 dark:text-gray-400">
                       {capability.lastUpdate.toLocaleTimeString()}
@@ -346,15 +294,13 @@ export const CapabilitiesStatusPanel: React.FC<CapabilitiesStatusPanelProps> = (
               );
             })}
           </div>
-
-          {/* Footer */}
+          {}
           <div className="border-t border-gray-200 dark:border-gray-700 p-3">
             <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
               <div className="flex items-center gap-1">
                 <Clock size={12} />
                 <span>Last refresh: {lastRefresh.toLocaleTimeString()}</span>
               </div>
-              
               <div className="flex items-center gap-1">
                 {navigator.onLine ? (
                   <>
@@ -375,5 +321,4 @@ export const CapabilitiesStatusPanel: React.FC<CapabilitiesStatusPanelProps> = (
     </div>
   );
 };
-
 export default CapabilitiesStatusPanel;

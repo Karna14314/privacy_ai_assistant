@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { X, FileText, Plus, Trash2, Edit2, Search, Tag, Calendar, BookOpen, Save, Eye, EyeOff } from 'lucide-react';
 import { cn } from '../../utils/cn';
-
 interface NotesDashboardProps {
   onClose: () => void;
   onExecute: (data: any) => Promise<{ success: boolean; message: string }>;
 }
-
 interface Note {
   id: string;
   title: string;
@@ -20,7 +18,6 @@ interface Note {
   wordCount: number;
   characterCount: number;
 }
-
 const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) => {
   const [activeTab, setActiveTab] = useState<'notes' | 'categories' | 'search' | 'settings'>('notes');
   const [notes, setNotes] = useState<Note[]>([]);
@@ -35,20 +32,15 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error' | 'loading'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
-
-  // Form state for new/editing note
   const [noteTitle, setNoteTitle] = useState('');
   const [noteContent, setNoteContent] = useState('');
   const [noteTags, setNoteTags] = useState('');
   const [noteCategory, setNoteCategory] = useState('');
   const [noteIsFavorite, setNoteIsFavorite] = useState(false);
   const [noteIsPrivate, setNoteIsPrivate] = useState(false);
-
-  // Load saved data
   useEffect(() => {
     loadNotesData();
   }, []);
-
   const loadNotesData = () => {
     try {
       const savedNotes = localStorage.getItem('notes_data');
@@ -64,7 +56,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
       console.error('Failed to load notes data:', error);
     }
   };
-
   const saveNotesData = (newNotes: Note[]) => {
     try {
       localStorage.setItem('notes_data', JSON.stringify(newNotes));
@@ -72,15 +63,12 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
       console.error('Failed to save notes data:', error);
     }
   };
-
   const calculateWordCount = (text: string) => {
     return text.trim().split(/\s+/).filter(word => word.length > 0).length;
   };
-
   const calculateCharacterCount = (text: string) => {
     return text.length;
   };
-
   const createNewNote = () => {
     setSelectedNote(null);
     setIsEditing(true);
@@ -91,7 +79,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
     setNoteIsFavorite(false);
     setNoteIsPrivate(false);
   };
-
   const editNote = (note: Note) => {
     setSelectedNote(note);
     setIsEditing(true);
@@ -102,21 +89,16 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
     setNoteIsFavorite(note.isFavorite);
     setNoteIsPrivate(note.isPrivate);
   };
-
   const saveNote = async () => {
     if (!noteTitle.trim()) return;
-
     setIsLoading(true);
     setStatus('loading');
     setStatusMessage('Saving note...');
-
     try {
       const tags = noteTags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
       const wordCount = calculateWordCount(noteContent);
       const characterCount = calculateCharacterCount(noteContent);
-
       if (selectedNote) {
-        // Update existing note
         const updatedNote: Note = {
           ...selectedNote,
           title: noteTitle.trim(),
@@ -129,18 +111,15 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
           wordCount,
           characterCount
         };
-
         const updatedNotes = notes.map(note =>
           note.id === selectedNote.id ? updatedNote : note
         );
         setNotes(updatedNotes);
         saveNotesData(updatedNotes);
-
         const result = await onExecute({
           toolData: { action: 'update_note', note: updatedNote },
           context: { notes: updatedNotes }
         });
-
         if (result.success) {
           setStatus('success');
           setStatusMessage('Note updated successfully');
@@ -151,7 +130,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
           setStatusMessage(result.message);
         }
       } else {
-        // Create new note
         const newNote: Note = {
           id: Date.now().toString(),
           title: noteTitle.trim(),
@@ -165,16 +143,13 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
           wordCount,
           characterCount
         };
-
         const updatedNotes = [...notes, newNote];
         setNotes(updatedNotes);
         saveNotesData(updatedNotes);
-
         const result = await onExecute({
           toolData: { action: 'create_note', note: newNote },
           context: { notes: updatedNotes }
         });
-
         if (result.success) {
           setStatus('success');
           setStatusMessage('Note created successfully');
@@ -193,39 +168,32 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
       setTimeout(() => setStatus('idle'), 3000);
     }
   };
-
   const deleteNote = async (id: string) => {
     const updatedNotes = notes.filter(note => note.id !== id);
     setNotes(updatedNotes);
     saveNotesData(updatedNotes);
-
     if (selectedNote?.id === id) {
       setSelectedNote(null);
       setIsEditing(false);
     }
-
     await onExecute({
       toolData: { action: 'delete_note', id },
       context: { notes: updatedNotes }
     });
   };
-
   const toggleFavorite = async (note: Note) => {
     const updatedNote = { ...note, isFavorite: !note.isFavorite, updatedAt: new Date() };
     const updatedNotes = notes.map(n => n.id === note.id ? updatedNote : n);
     setNotes(updatedNotes);
     saveNotesData(updatedNotes);
-
     if (selectedNote?.id === note.id) {
       setSelectedNote(updatedNote);
     }
-
     await onExecute({
       toolData: { action: 'toggle_favorite', note: updatedNote },
       context: { notes: updatedNotes }
     });
   };
-
   const filteredAndSortedNotes = notes
     .filter(note => {
       if (!showPrivate && note.isPrivate) return false;
@@ -263,24 +231,21 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
       }
       return sortOrder === 'asc' ? comparison : -comparison;
     });
-
   const categories = Array.from(new Set(notes.map(note => note.category)));
   const allTags = Array.from(new Set(notes.flatMap(note => note.tags)));
   const totalNotes = notes.length;
   const totalWords = notes.reduce((sum, note) => sum + note.wordCount, 0);
   const favoriteNotes = notes.filter(note => note.isFavorite).length;
-
   const tabs = [
     { id: 'notes', label: 'Notes', icon: FileText },
     { id: 'categories', label: 'Categories', icon: Tag },
     { id: 'search', label: 'Search', icon: Search },
     { id: 'settings', label: 'Settings', icon: BookOpen }
   ];
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-7xl h-[90vh] flex flex-col">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
             <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
@@ -302,8 +267,7 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
             <X size={20} />
           </button>
         </div>
-
-        {/* Status Bar */}
+        {}
         {status !== 'idle' && (
           <div className={cn(
             "px-6 py-3 flex items-center space-x-2 transition-all duration-300",
@@ -317,8 +281,7 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
             <span className="text-sm font-medium">{statusMessage}</span>
           </div>
         )}
-
-        {/* Tabs */}
+        {}
         <div className="flex border-b border-gray-200 dark:border-gray-700">
           {tabs.map(tab => (
             <button
@@ -336,12 +299,11 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
             </button>
           ))}
         </div>
-
-        {/* Content */}
+        {}
         <div className="flex-1 flex overflow-hidden">
-          {/* Sidebar */}
+          {}
           <div className="w-80 border-r border-gray-200 dark:border-gray-700 flex flex-col">
-            {/* Search and Filters */}
+            {}
             <div className="p-4 border-b border-gray-200 dark:border-gray-700">
               <div className="space-y-3">
                 <div className="relative">
@@ -354,7 +316,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
                     placeholder="Search notes..."
                   />
                 </div>
-                
                 <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Category
@@ -370,7 +331,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
                     ))}
                   </select>
                 </div>
-
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -385,8 +345,7 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
                 </div>
               </div>
             </div>
-
-            {/* Notes List */}
+            {}
             <div className="flex-1 overflow-y-auto p-4">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">Notes</h3>
@@ -397,7 +356,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
                   <Plus size={16} />
                 </button>
               </div>
-
               <div className="space-y-2">
                 {filteredAndSortedNotes.length === 0 ? (
                   <div className="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -483,11 +441,9 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
               </div>
             </div>
           </div>
-
-          {/* Main Content */}
+          {}
           <div className="flex-1 flex flex-col">
             {isEditing ? (
-              /* Edit Mode */
               <div className="flex-1 flex flex-col p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -510,7 +466,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
                     </button>
                   </div>
                 </div>
-
                 <div className="space-y-4 flex-1">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -524,7 +479,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
                       placeholder="Enter note title..."
                     />
                   </div>
-
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -551,7 +505,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
                       />
                     </div>
                   </div>
-
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">
                       <input
@@ -572,7 +525,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
                       <span className="text-sm text-gray-700 dark:text-gray-300">Private</span>
                     </label>
                   </div>
-
                   <div className="flex-1">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Content
@@ -584,7 +536,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
                       placeholder="Start writing your note..."
                     />
                   </div>
-
                   <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                     <span>{calculateWordCount(noteContent)} words</span>
                     <span>{calculateCharacterCount(noteContent)} characters</span>
@@ -592,7 +543,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
                 </div>
               </div>
             ) : selectedNote ? (
-              /* View Mode */
               <div className="flex-1 flex flex-col p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
@@ -611,7 +561,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
                     </button>
                   </div>
                 </div>
-
                 <div className="space-y-4 flex-1">
                   <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                     <span>Category: {selectedNote.category}</span>
@@ -619,7 +568,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
                     <span>{selectedNote.characterCount} characters</span>
                     <span>Updated: {selectedNote.updatedAt.toLocaleString()}</span>
                   </div>
-
                   {selectedNote.tags.length > 0 && (
                     <div className="flex items-center space-x-2">
                       <span className="text-sm text-gray-500 dark:text-gray-400">Tags:</span>
@@ -633,7 +581,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
                       ))}
                     </div>
                   )}
-
                   <div className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 overflow-y-auto">
                     <div className="prose prose-sm max-w-none dark:prose-invert">
                       {selectedNote.content.split('\n').map((line, index) => (
@@ -646,7 +593,6 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
                 </div>
               </div>
             ) : (
-              /* Empty State */
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center text-gray-500 dark:text-gray-400">
                   <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
@@ -668,5 +614,4 @@ const NotesDashboard: React.FC<NotesDashboardProps> = ({ onClose, onExecute }) =
     </div>
   );
 };
-
-export default NotesDashboard; 
+export default NotesDashboard;

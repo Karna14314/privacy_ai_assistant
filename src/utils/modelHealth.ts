@@ -1,6 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
 import { TAURI_ENV } from './tauriDetection';
-
 export interface ModelHealthStatus {
   isAvailable: boolean;
   isChecking: boolean;
@@ -11,7 +10,6 @@ export interface ModelHealthStatus {
   serviceUrl: string;
   lastSuccessfulCheck: Date | null;
 }
-
 export class ModelHealthChecker {
   private static instance: ModelHealthChecker;
   private status: ModelHealthStatus = {
@@ -25,21 +23,16 @@ export class ModelHealthChecker {
     lastSuccessfulCheck: null,
   };
   private listeners: Array<(status: ModelHealthStatus) => void> = [];
-
   private constructor() {}
-
   static getInstance(): ModelHealthChecker {
     if (!ModelHealthChecker.instance) {
       ModelHealthChecker.instance = new ModelHealthChecker();
     }
     return ModelHealthChecker.instance;
   }
-
   subscribe(listener: (status: ModelHealthStatus) => void): () => void {
     this.listeners.push(listener);
-    // Immediately call with current status
     listener(this.status);
-    
     return () => {
       const index = this.listeners.indexOf(listener);
       if (index > -1) {
@@ -47,17 +40,13 @@ export class ModelHealthChecker {
       }
     };
   }
-
   private notifyListeners(): void {
     this.listeners.forEach(listener => listener(this.status));
   }
-
   async checkHealth(): Promise<boolean> {
     if (this.status.isChecking) {
       return this.status.isAvailable;
     }
-
-    // Check if running in Tauri environment
     if (!TAURI_ENV.isTauri) {
       console.log('Running in browser mode - model health check disabled');
       this.status = {
@@ -71,7 +60,6 @@ export class ModelHealthChecker {
       this.notifyListeners();
       return false;
     }
-
     this.status = {
       ...this.status,
       isChecking: true,
@@ -79,11 +67,9 @@ export class ModelHealthChecker {
       connectionState: 'checking',
     };
     this.notifyListeners();
-
     try {
       console.log('Checking model health...');
       const isHealthy = await invoke<boolean>('check_llm_health');
-      
       this.status = {
         ...this.status,
         isAvailable: isHealthy,
@@ -93,13 +79,11 @@ export class ModelHealthChecker {
         connectionState: isHealthy ? 'connected' : 'disconnected',
         lastSuccessfulCheck: isHealthy ? new Date() : this.status.lastSuccessfulCheck,
       };
-      
       console.log('Model health check result:', isHealthy);
       this.notifyListeners();
       return isHealthy;
     } catch (error) {
       console.error('Model health check failed:', error);
-      
       this.status = {
         ...this.status,
         isAvailable: false,
@@ -108,30 +92,22 @@ export class ModelHealthChecker {
         error: error instanceof Error ? error.message : String(error),
         connectionState: 'error',
       };
-      
       this.notifyListeners();
       return false;
     }
   }
-
   getStatus(): ModelHealthStatus {
     return { ...this.status };
   }
-
   async startPeriodicCheck(intervalMs: number = 15000): Promise<void> {
-    // Initial check
     await this.checkHealth();
-    
-    // Set up periodic checks
     setInterval(async () => {
       await this.checkHealth();
     }, intervalMs);
   }
-
   async forceCheck(): Promise<boolean> {
     return await this.checkHealth();
   }
-
   getDetailedStatus(): {
     status: ModelHealthStatus;
     statusText: string;
@@ -140,7 +116,6 @@ export class ModelHealthChecker {
     const status = this.getStatus();
     let statusText = '';
     let recommendations: string[] = [];
-
     switch (status.connectionState) {
       case 'connected':
         statusText = `${status.modelName} is connected and ready`;
@@ -169,18 +144,13 @@ export class ModelHealthChecker {
         }
         break;
     }
-
     return { status, statusText, recommendations };
   }
-
   async checkModelInstallation(): Promise<{ installed: boolean; availableModels: string[] }> {
     try {
       if (!TAURI_ENV.isTauri) {
         return { installed: false, availableModels: [] };
       }
-
-      // This would need a new Tauri command to list available models
-      // For now, we'll use the health check as a proxy
       const isHealthy = await this.checkHealth();
       return {
         installed: isHealthy,
@@ -192,6 +162,4 @@ export class ModelHealthChecker {
     }
   }
 }
-
-// Export singleton instance
 export const modelHealthChecker = ModelHealthChecker.getInstance();

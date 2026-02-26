@@ -1,4 +1,3 @@
-/* Context Management Animations */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -9,7 +8,6 @@
     transform: translateY(0);
   }
 }
-
 @keyframes fade-out {
   from {
     opacity: 1;
@@ -20,7 +18,6 @@
     transform: translateY(-10px);
   }
 }
-
 @keyframes slide-in-right {
   from {
     opacity: 0;
@@ -31,7 +28,6 @@
     transform: translateX(0);
   }
 }
-
 @keyframes slide-out-right {
   from {
     opacity: 1;
@@ -42,7 +38,6 @@
     transform: translateX(100%);
   }
 }
-
 @keyframes pulse-glow {
   0%, 100% {
     box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
@@ -51,7 +46,6 @@
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
   }
 }
-
 @keyframes bounce-subtle {
   0%, 20%, 50%, 80%, 100% {
     transform: translateY(0);
@@ -63,7 +57,6 @@
     transform: translateY(-2px);
   }
 }
-
 @keyframes expand-collapse {
   from {
     max-height: 0;
@@ -74,42 +67,31 @@
     opacity: 1;
   }
 }
-
-/* Utility Classes */
 .animate-fade-in {
   animation: fade-in 0.3s ease-out forwards;
 }
-
 .animate-fade-out {
   animation: fade-out 0.3s ease-out forwards;
 }
-
 .animate-slide-in-right {
   animation: slide-in-right 0.3s ease-out forwards;
 }
-
 .animate-slide-out-right {
   animation: slide-out-right 0.3s ease-out forwards;
 }
-
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
 }
-
 .animate-bounce-subtle {
   animation: bounce-subtle 1s ease-in-out;
 }
-
 .animate-expand {
   animation: expand-collapse 0.3s ease-out forwards;
 }
-
-/* Context Window Specific Animations */
 .context-optimizing {
   position: relative;
   overflow: hidden;
 }
-
 .context-optimizing::before {
   content: '';
   position: absolute;
@@ -125,7 +107,6 @@
   );
   animation: shimmer 1.5s infinite;
 }
-
 @keyframes shimmer {
   0% {
     left: -100%;
@@ -134,52 +115,36 @@
     left: 100%;
   }
 }
-
-/* Voice Chat Animations */
 .voice-recording {
   animation: pulse-glow 1s ease-in-out infinite;
 }
-
 .voice-waveform {
   animation: bounce-subtle 0.5s ease-in-out infinite alternate;
 }
-
-/* Browser Integration Animations */
 .browser-slide-in {
   animation: slide-in-right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
-
 .browser-slide-out {
   animation: slide-out-right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
-
-/* Notification Animations */
 .notification-enter {
   animation: fade-in 0.3s ease-out forwards;
 }
-
 .notification-exit {
   animation: fade-out 3s ease-out 3s forwards;
 }
-
-/* Status Indicator Animations */
 .status-connected {
   animation: pulse-glow 2s ease-in-out infinite;
 }
-
 .status-processing {
   animation: shimmer 1s linear infinite;
 }
-
 .status-error {
   animation: bounce-subtle 0.5s ease-in-out 3;
 }
-
-/* Model Selector Animations */
 .model-switching {
   position: relative;
 }
-
 .model-switching::after {
   content: '';
   position: absolute;
@@ -195,7 +160,6 @@
   );
   animation: diagonal-sweep 1s ease-in-out;
 }
-
 @keyframes diagonal-sweep {
   0% {
     transform: translateX(-100%) translateY(-100%);
@@ -204,17 +168,12 @@
     transform: translateX(100%) translateY(100%);
   }
 }
-
-/* Capabilities Panel Animations */
 .capability-update {
   animation: bounce-subtle 0.3s ease-out;
 }
-
 .capability-status-change {
   animation: pulse-glow 0.5s ease-out;
 }
-
-/* Responsive Animations */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -224,12 +183,9 @@
     transition-duration: 0.01ms !important;
   }
 }
-
-/* Dark Mode Specific Animations */
 .dark .animate-pulse-glow {
   animation: pulse-glow-dark 2s ease-in-out infinite;
 }
-
 @keyframes pulse-glow-dark {
   0%, 100% {
     box-shadow: 0 0 5px rgba(96, 165, 250, 0.5);
@@ -238,17 +194,12 @@
     box-shadow: 0 0 20px rgba(96, 165, 250, 0.8);
   }
 }
-
-/* Smooth Transitions */
 .transition-smooth {
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
-
 .transition-bounce {
   transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
-
-/* Loading States */
 .loading-shimmer {
   background: linear-gradient(
     90deg,
@@ -259,7 +210,6 @@
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
-
 .dark .loading-shimmer {
   background: linear-gradient(
     90deg,
@@ -269,24 +219,18 @@
   );
   background-size: 200% 100%;
 }
-
-/* Interactive Hover Effects */
 .hover-lift {
   transition: transform 0.2s ease-out;
 }
-
 .hover-lift:hover {
   transform: translateY(-2px);
 }
-
 .hover-glow {
   transition: box-shadow 0.2s ease-out;
 }
-
 .hover-glow:hover {
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
-
 .dark .hover-glow:hover {
   box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
 }
